@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Route;
         Route::middleware('auth:student')->group(function () {
             Route::post("/verification-email/verify",[StudentAuthController::class,"verifyCode"]);
             Route::group(["middleware"=>"hasVerified"],function(){
+                Route::get('/me',[StudentAuthController::class,"profile"]);
+                Route::post("/me",[StudentAuthController::class,"updateProfile"]);
                 Route::post('/logout', [StudentAuthController::class, 'logout']);
             });
         });
@@ -41,6 +43,8 @@ use Illuminate\Support\Facades\Route;
         Route::middleware('auth:family')->group(function () {
             Route::post("/verification-email/verify",[FamilyAuthController::class,"verifyCode"]);
             Route::group(["middleware"=>"hasVerified"],function(){
+                Route::get('/me',[FamilyAuthController::class,"profile"]);
+                Route::post("/me",[FamilyAuthController::class,"updateProfile"]);
                 Route::post('/logout', [FamilyAuthController::class, 'logout']);
             });
         });
@@ -57,6 +61,8 @@ use Illuminate\Support\Facades\Route;
         Route::middleware('auth:teacher')->group(function () {
             Route::post("/verification-email/verify",[TeacherAuthController::class,"verifyCode"]);
             Route::group(["middleware"=>"hasVerified"],function(){
+                Route::get('/me',[TeacherAuthController::class,"profile"]);
+                Route::post("/me",[TeacherAuthController::class,"updateProfile"]);
                 Route::post('/logout', [TeacherAuthController::class, 'logout']);
             });
         });

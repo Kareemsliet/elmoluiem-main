@@ -15,6 +15,7 @@ class CreateFamilesTable extends Migration
 			$table->string('password');
 			$table->string('email');
 			$table->timestamp("email_verified_expired")->nullable();
+			$table->text("description")->nullable();
 			$table->string('phone')->nullable();
 			$table->string("gender")->default(GenderTypesEnums::Male->value);
 			$table->timestamp("email_verified_at")->nullable();

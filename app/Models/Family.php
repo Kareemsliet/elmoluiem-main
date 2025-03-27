@@ -22,6 +22,7 @@ class Family extends Authenticatable implements MustVerifyEmail
         "gender",
         "email_verified_expired",
         'education_level_id',
+        "description",
         'profile_image'
     ];
     protected $hidden = ['password'];
@@ -36,7 +37,7 @@ class Family extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function eucationLevel(){
+    public function educationLevel(){
         return $this->belongsTo(EducationLevel::class,"education_level_id");
     }
 

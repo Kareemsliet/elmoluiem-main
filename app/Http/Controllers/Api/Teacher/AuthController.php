@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api\Teacher;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Teacher\LoginRequest;
+use App\Http\Requests\Api\Teacher\ProfileUpdateRequest;
 use App\Http\Requests\Api\Teacher\RegisterRequest;
 use App\Http\Requests\Api\Teacher\UpdatePasswordRequest;
 use App\Http\Resources\TeacherResource;
+use App\Http\Services\ImageService;
 use App\Http\Services\VerficationService;
 use App\Models\Subject;
 use App\Models\Teacher;
@@ -106,6 +108,51 @@ class AuthController extends Controller
         ]);
 
         return successResponse("Success Verification Email");
+    }
+
+    public function profile(Request $request)
+    {
+        $teacher = $request->user("teacher");
+
+        return successResponse(data:new TeacherResource($teacher));
+    }
+
+    public function updateProfile(ProfileUpdateRequest $request)
+    {
+        $request->validated();
+
+        $teacher = $request->user("teacher");
+
+        $data = $request->only(["name", "email", "address", 'phone', "education_level_id", "gender","description","qualification","experince"]);
+
+        if ($request->profile_image) {
+            if ($teacher->profile_image) {
+                (new ImageService())->destroyImage($teacher->profile_image, "teachers");
+            }
+            $data["profile_image"] = (new ImageService())->uploadImage($request->file("profile_image"), "teachers");
+        }
+
+        if ($request->cv) {
+            if ($teacher->cv) {
+                (new ImageService())->destroyImage($teacher->cv, "teachers");
+            }
+            $data["cv"] = (new ImageService())->uploadImage($request->file("cv"), "teachers");
+        }
+
+        if ($data["email"] != $teacher->email) {
+        
+            $data["email_verified_at"] = null;
+        
+            (new VerficationService())->sendEmailVerificationCode($teacher);
+        }
+
+        $teacher->update($data);
+
+        $subjects=Subject::whereIn("id",$request->subjects)->get()->pluck("id")->toArray();
+
+        $teacher->subjects()->sync($subjects);
+
+        return successResponse(data:new TeacherResource($teacher));
     }
 
 }
