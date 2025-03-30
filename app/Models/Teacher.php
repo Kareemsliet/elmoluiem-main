@@ -54,4 +54,8 @@ class Teacher extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Subject::class,"teacher_subject");
     }
 
+    public function lessons(){
+        return $this->hasMany(Lesson::class,"teacher_id");
+    }
+
 }

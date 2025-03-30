@@ -78,7 +78,7 @@
         <div class="content">
             <p>Hello</p>
             
-            <p>Thank you for registering with El Molium. To complete your registration, please verify your email address by entering the following verification code:</p>
+            <p>Thank you for registering with Elmullim. To complete your registration, please verify your email address by entering the following verification code:</p>
             
             <div class="verification-code">
                 {{$code}}
@@ -89,8 +89,8 @@
         </div>
         
         <div class="footer">
-            <p>© 2025 El Moliuem. All rights reserved.</p>
-            <p>You're receiving this email because you signed up for an account with [Your Company Name].</p>
+            <p>© 2025 Elmullim. All rights reserved.</p>
+            <p>You're receiving this email because you signed up for an account with Elmullim.</p>
         </div>
     </div>
 </body>

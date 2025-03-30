@@ -4,6 +4,9 @@ use App\Http\Controllers\Api\MainController;
 use App\Http\Controllers\Api\Student\AuthController as StudentAuthController;
 use App\Http\Controllers\Api\Teacher\AuthController as TeacherAuthController;
 use App\Http\Controllers\Api\Family\AuthController as FamilyAuthController;
+use App\Http\Controllers\Api\Teacher\Lessons\ContentsController;
+use App\Http\Controllers\Api\Teacher\Lessons\LecturesController;
+use App\Http\Controllers\Api\Teacher\Lessons\LessonController;
 use Illuminate\Support\Facades\Route;
 
     Route::group(["prefix" => "main"], function () {
@@ -24,10 +27,10 @@ use Illuminate\Support\Facades\Route;
 
         Route::middleware('auth:student')->group(function () {
             Route::post("/verification-email/verify",[StudentAuthController::class,"verifyCode"]);
+            Route::post('/logout', [StudentAuthController::class, 'logout']);
             Route::group(["middleware"=>"hasVerified"],function(){
                 Route::get('/me',[StudentAuthController::class,"profile"]);
                 Route::post("/me",[StudentAuthController::class,"updateProfile"]);
-                Route::post('/logout', [StudentAuthController::class, 'logout']);
             });
         });
 
@@ -42,10 +45,10 @@ use Illuminate\Support\Facades\Route;
 
         Route::middleware('auth:family')->group(function () {
             Route::post("/verification-email/verify",[FamilyAuthController::class,"verifyCode"]);
+            Route::post('/logout', [FamilyAuthController::class, 'logout']);
             Route::group(["middleware"=>"hasVerified"],function(){
                 Route::get('/me',[FamilyAuthController::class,"profile"]);
                 Route::post("/me",[FamilyAuthController::class,"updateProfile"]);
-                Route::post('/logout', [FamilyAuthController::class, 'logout']);
             });
         });
 
@@ -60,13 +63,16 @@ use Illuminate\Support\Facades\Route;
 
         Route::middleware('auth:teacher')->group(function () {
             Route::post("/verification-email/verify",[TeacherAuthController::class,"verifyCode"]);
+            Route::post('/logout', [TeacherAuthController::class, 'logout']);
             Route::group(["middleware"=>"hasVerified"],function(){
                 Route::get('/me',[TeacherAuthController::class,"profile"]);
                 Route::post("/me",[TeacherAuthController::class,"updateProfile"]);
-                Route::post('/logout', [TeacherAuthController::class, 'logout']);
+                Route::apiResource("/lessons",LessonController::class);
+                Route::apiResource("/{lesson_id}/contents",ContentsController::class);
+                Route::apiResource("/{content_id}/lectures",LecturesController::class);
             });
         });
-    
+
     });
 
     
