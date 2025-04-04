@@ -22,7 +22,9 @@ class Student extends Authenticatable implements MustVerifyEmail
         'address',
         "email_verified_expired",
         "gender",
-        'profile_image'
+        'profile_image',
+        "reset_password_code",
+        "reset_password_expired",
     ];
     protected $hidden = [
         'password'
@@ -32,6 +34,7 @@ class Student extends Authenticatable implements MustVerifyEmail
         return [
             "email_verified_expired"=>"datetime",
             "password" => "hashed",
+            "reset_password_expired"=>"datetime",
             "gender"=>GenderTypesEnums::class,
         ];
     }

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Teacher\LoginRequest;
 use App\Http\Requests\Api\Teacher\ProfileUpdateRequest;
 use App\Http\Requests\Api\Teacher\RegisterRequest;
-use App\Http\Requests\Api\Teacher\UpdatePasswordRequest;
 use App\Http\Resources\TeacherResource;
 use App\Http\Services\ImageService;
 use App\Http\Services\VerficationService;
@@ -70,19 +69,6 @@ class AuthController extends Controller
         $teacher->currentAccessToken()->delete();
 
         return successResponse("success logout");
-    }
-
-    public function updatePassword(UpdatePasswordRequest $request)
-    {
-        $request->validated();
-
-        $teacher=Teacher::where("email",'=',$request->input("email"))->first();
-
-        $teacher->update([
-            "password"=>$request->input("password"),
-        ]);
-
-        return successResponse("Done! updated password");
     }
 
     public function verifyCode(Request $request){
@@ -153,6 +139,70 @@ class AuthController extends Controller
         $teacher->subjects()->sync($subjects);
 
         return successResponse(data:new TeacherResource($teacher));
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $validation = validator($request->only(["password","password_confirmation"]), [
+            "password" => "required|min:8|confirmed",
+        ]);
+        
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $parent=$request->user("teacher");
+
+        $parent->update([
+            "password" => $request->input("password"),
+        ]);
+
+        return successResponse("Done! updated password");
+    }
+
+    public function forgetPassword(Request $request)
+    {
+        $validation = validator($request->only(["email"]), [
+            "email" => "required|email|exists:teachers,email",
+        ]);
+
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $validation->validated();
+
+        $teacher = Teacher::where("email", '=', $request->input("email"))->first();
+
+        (new VerficationService())->sendResetPasswordVerificationCode($teacher);
+
+        return successResponse("Done! reset password code sent to your email");
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validation = validator($request->only(["code", "password","password_confirmation"]), [
+            "code" => "required|numeric|exists:teachers,reset_password_code",
+            "password" => "required|min:8|confirmed",
+        ]);
+
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $validation->validated();
+
+        $teacher = Teacher::where("reset_password_code", '=', $request->input("code"))->first();
+
+        if (!now()->isBefore($teacher->reset_password_expired)) {
+            return failResponse("The code is expired");
+        }
+
+        $teacher->update([
+            "password" => Hash::make($request->input("password")),
+        ]);
+
+        return successResponse("Done! updated password");
     }
 
 }

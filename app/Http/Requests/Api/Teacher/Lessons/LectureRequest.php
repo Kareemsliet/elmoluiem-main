@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Teacher\Lessons;
 
+use App\Rules\UniqueColumnById;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LectureRequest extends FormRequest
@@ -21,17 +22,18 @@ class LectureRequest extends FormRequest
      */
     public function rules(): array
     {
+        $lecture=$this->route("lecture",0);
+
         return [
-            "title" => "required|string|max:100",
+            "title" => ["required","string","max:100",new UniqueColumnById("lectures",'title',"contents",'content_id',$lecture)],
             "description" => "required|string",
-            "content_id" => "required|exists:contents,id",
             "deuration" => "required|integer",
             "video" => $this->when(function () {
-                return $this->method() == "Post";
+                return $this->getMethod() == "POST";
             }, function () {
-                return "required|file|mimes:mp4|mimetypes:video/mp4";
+                return "required|mimes:mp4|mimetypes:video/mp4|max:10000";
             }, function () {
-                return "required|file|mimes:mp4|mimetypes:video/mp4";
+                return "nullable|mimes:mp4|mimetypes:video/mp4|max:10000";
             }),
         ];
     }

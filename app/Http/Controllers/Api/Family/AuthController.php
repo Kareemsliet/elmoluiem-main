@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Family;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Family\LoginRequest;
-use App\Http\Requests\Api\Family\PasswordUpdateRequest;
 use App\Http\Requests\Api\Family\ProfileUpdateRequest;
 use App\Http\Requests\Api\Family\RegisterRequest;
 use App\Http\Resources\FamilyResource;
@@ -72,19 +71,6 @@ class AuthController extends Controller
         return successResponse("success logout");
     }
 
-    public function updatePassword(PasswordUpdateRequest $request)
-    {
-        $request->validated();
-
-        $parent = Family::where("email", '=', $request->input("email"))->first();
-
-        $parent->update([
-            "password" => $request->input("password"),
-        ]);
-
-        return successResponse("Done! updated password");
-    }
-
     public function verifyCode(Request $request)
     {
 
@@ -148,5 +134,70 @@ class AuthController extends Controller
 
         return successResponse(data: new FamilyResource($family));
     }
+
+    public function updatePassword(Request $request)
+    {
+        $validation = validator($request->only(["password","password_confirmation"]), [
+            "password" => "required|min:8|confirmed",
+        ]);
+        
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $parent=$request->user("family");
+
+        $parent->update([
+            "password" => $request->input("password"),
+        ]);
+
+        return successResponse("Done! updated password");
+    }
+
+    public function forgetPassword(Request $request)
+    {
+        $validation = validator($request->only(["email"]), [
+            "email" => "required|email|exists:familes,email",
+        ]);
+
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $validation->validated();
+
+        $family = Family::where("email", '=', $request->input("email"))->first();
+
+        (new VerficationService())->sendResetPasswordVerificationCode($family);
+
+        return successResponse("Done! reset password code sent to your email");
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validation = validator($request->only(["code", "password","password_confirmation"]), [
+            "code" => "required|numeric|exists:familes,reset_password_code",
+            "password" => "required|min:8|confirmed",
+        ]);
+
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $validation->validated();
+
+        $family = Family::where("reset_password_code", '=', $request->input("code"))->first();
+
+        if (!now()->isBefore($family->reset_password_expired)) {
+            return failResponse("The code is expired");
+        }
+
+        $family->update([
+            "password" => Hash::make($request->input("password")),
+        ]);
+
+        return successResponse("Done! updated password");
+    }
+
 
 }

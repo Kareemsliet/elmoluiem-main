@@ -10,9 +10,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "cloudinary/cloudinary_php": "^3.1",
         "laravel/framework": "^11.41",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.10.1"
+        "laravel/tinker": "^2.10.1",
+        "vimeo/laravel": "^5.10",
+        "vimeo/vimeo-api": "^3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -23,12 +23,14 @@ use Illuminate\Support\Facades\Route;
 
         Route::post('/register', [StudentAuthController::class, 'register']);
         Route::post('/login', [StudentAuthController::class, 'login']);
-        Route::post('/update-password', [StudentAuthController::class, 'updatePassword']);
+        Route::post("/forget-password",[StudentAuthController::class,"forgetPassword"])->middleware("throttleApi:1,1");
+        Route::post("/reset-password",[StudentAuthController::class,"resetPassword"]);
 
         Route::middleware('auth:student')->group(function () {
             Route::post("/verification-email/verify",[StudentAuthController::class,"verifyCode"]);
             Route::post('/logout', [StudentAuthController::class, 'logout']);
             Route::group(["middleware"=>"hasVerified"],function(){
+                Route::post('/update-password', [StudentAuthController::class, 'updatePassword']);
                 Route::get('/me',[StudentAuthController::class,"profile"]);
                 Route::post("/me",[StudentAuthController::class,"updateProfile"]);
             });
@@ -41,12 +43,14 @@ use Illuminate\Support\Facades\Route;
         
         Route::post('/register', [FamilyAuthController::class, 'register']);
         Route::post('/login', [FamilyAuthController::class, 'login']);
-        Route::post('/update-password', [FamilyAuthController::class, 'updatePassword']);
-
+        Route::post("/forget-password",[FamilyAuthController::class,"forgetPassword"])->middleware("throttleApi:1,1");
+        Route::post("/reset-password",[FamilyAuthController::class,"resetPassword"]);
+        
         Route::middleware('auth:family')->group(function () {
             Route::post("/verification-email/verify",[FamilyAuthController::class,"verifyCode"]);
             Route::post('/logout', [FamilyAuthController::class, 'logout']);
             Route::group(["middleware"=>"hasVerified"],function(){
+                Route::post('/update-password', [FamilyAuthController::class, 'updatePassword']);
                 Route::get('/me',[FamilyAuthController::class,"profile"]);
                 Route::post("/me",[FamilyAuthController::class,"updateProfile"]);
             });
@@ -59,12 +63,14 @@ use Illuminate\Support\Facades\Route;
         
         Route::post('/register', [TeacherAuthController::class, 'register']);
         Route::post('/login', [TeacherAuthController::class, 'login']);
-        Route::post('/update-password', [TeacherAuthController::class, 'updatePassword']);
+        Route::post("/forget-password",[TeacherAuthController::class,"forgetPassword"])->middleware("throttleApi:1,1");
+        Route::post("/reset-password",[TeacherAuthController::class,"resetPassword"]);
 
         Route::middleware('auth:teacher')->group(function () {
             Route::post("/verification-email/verify",[TeacherAuthController::class,"verifyCode"]);
             Route::post('/logout', [TeacherAuthController::class, 'logout']);
             Route::group(["middleware"=>"hasVerified"],function(){
+                Route::post('/update-password', [TeacherAuthController::class, 'updatePassword']);
                 Route::get('/me',[TeacherAuthController::class,"profile"]);
                 Route::post("/me",[TeacherAuthController::class,"updateProfile"]);
                 Route::apiResource("/lessons",LessonController::class);

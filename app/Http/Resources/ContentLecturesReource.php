@@ -2,8 +2,10 @@
 
 namespace App\Http\Resources;
 use App\Http\Services\ImageService;
+use App\Http\Services\ViemoService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class ContentLecturesReource extends JsonResource
 {
@@ -18,9 +20,8 @@ class ContentLecturesReource extends JsonResource
             "id"=>$this->id,
             "title"=>$this->title,
             "description"=>$this->description,
-            "video"=>(new ImageService())->imageUrlToBase64("teachers/lessons/lectures/$this->video"),
             "deuration"=>$this->deuration,
-            "contents"=>new ContentReource($this->content),
+            "video"=> (new ViemoService())->videoUrl($this->video),
         ];
     }
 }

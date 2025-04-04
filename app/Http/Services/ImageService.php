@@ -34,9 +34,11 @@ class ImageService
 
       $extension = explode('/', $contentType)[1]; // Get the image extension
 
+      $type=explode('/', $contentType)[0];
+
       $imageBase64=base64_encode($imageContent);
 
-      $dataUri = "data:image/{$extension};base64,{$imageBase64}";
+      $dataUri = "data:$type/{$extension};base64,{$imageBase64}";
 
       return $dataUri;
     }

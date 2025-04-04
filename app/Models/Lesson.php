@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\TeacherTypeEnums;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Mail\Mailables\Content;
 
 class Lesson extends Model 
 {
@@ -18,7 +17,7 @@ class Lesson extends Model
     }
 
     public function contents(){
-        return $this->morphMany(Content::class,"containable");
+        return $this->morphMany(Content::class,"contentable");
     }
 
 }

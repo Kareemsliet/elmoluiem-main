@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Teacher\Lessons;
 
+use App\Rules\UniqueColumnById;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LessonRequest extends FormRequest
@@ -21,16 +22,18 @@ class LessonRequest extends FormRequest
      */
     public function rules(): array
     {
+        $lesson=$this->route("lesson",0);
+        
         return [
             "price"=>"required|numeric",
             "logo"=>$this->when(function(){
-                return $this->method()=="Post";
+                return $this->getMethod()=="POST";
             },function(){
                 return "required|image|max:15000|mimes:png,jpg,svg";
             },function(){
                 return "nullable|image|max:15000|mimes:png,jpg,svg";
             }),
-            "title"=>"required|string|max:100",
+            "title"=>["required","string","max:100",new UniqueColumnById("lessons",'title','teachers','teacher_id',$lesson)],
             "description"=>"required|string|max:250",
         ];
     }

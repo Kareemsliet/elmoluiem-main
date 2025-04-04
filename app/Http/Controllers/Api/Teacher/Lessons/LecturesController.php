@@ -6,7 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Teacher\Lessons\LectureRequest;
 use App\Http\Resources\ContentLecturesReource;
 use App\Http\Services\ImageService;
+use App\Http\Services\ViemoService;
+use App\Jobs\CompressAndStoreVideo;
 use App\Models\Content;
+use Cloudinary\Api\Upload\UploadApi;
+use Illuminate\Support\Facades\Storage;
 
 class LecturesController extends Controller
 {
@@ -38,9 +42,11 @@ class LecturesController extends Controller
 
         $data = $request->only(["title", "description", "deuration"]);
 
-        $video = (new ImageService())->uploadImage($request->file("video"), "teachers/lessons/lectures");
+        $videoPath = $request->file("video")->getRealPath();
 
-        $data["video"] = $video;
+        $videoUrl=(new ViemoService())->uploadVideo($videoPath,$data["title"], $data["description"]);
+
+        $data["video"]=$videoUrl;
 
         $lecture = $content->lectures()->create($data);
 
@@ -90,11 +96,13 @@ class LecturesController extends Controller
 
         if ($request->video) {
 
-            (new ImageService())->destroyImage($lecture->video,"teachers/lessons/lectures");
+            (new ViemoService())->deleteVideo($lecture->video);
 
-            $video = (new ImageService())->uploadImage($request->file("video"), "teachers/lessons/lectures");
+            $videoPath = $request->file("video")->getRealPath();
+            
+            $videoUrl=(new ViemoService())->uploadVideo($videoPath,$data["title"], $data["description"]);
 
-            $data["video"] = $video;
+            $data["video"]=$videoUrl;
         }
 
         $lecture->update($data);
@@ -119,7 +127,7 @@ class LecturesController extends Controller
             return failResponse("not found lecture");
         }
 
-        (new ImageService())->destroyImage($lecture->video,"teachers/lessons/lectures");
+        (new ViemoService())->deleteVideo($lecture->video);
 
         $lecture->delete();
 

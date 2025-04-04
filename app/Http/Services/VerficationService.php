@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Mail\PasswordResetVerification;
 use App\Mail\SendEmailVerificationCode;
 use Illuminate\Support\Facades\Mail;
 class VerficationService
@@ -23,4 +24,17 @@ class VerficationService
 
         Mail::to($user)->send(new SendEmailVerificationCode($code));
     }
+
+    public function sendResetPasswordVerificationCode($user)
+    {
+        $code = $this->generateCode();
+
+        $user->update([
+            "reset_password_code" => $code,
+            "reset_password_expired"=>now()->addHour(),
+        ]);
+
+        Mail::to($user)->send(new PasswordResetVerification($code));
+    }
+
 }

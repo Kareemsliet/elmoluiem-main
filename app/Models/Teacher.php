@@ -30,7 +30,9 @@ class Teacher extends Authenticatable implements MustVerifyEmail
         'cv',
         'course_type',
         "education_level_id",
-        "gender"
+        "gender",
+        "reset_password_expired",
+        "reset_password_code",
     ];
     protected $hidden = [
         'password'
@@ -41,6 +43,7 @@ class Teacher extends Authenticatable implements MustVerifyEmail
             "password" => "hashed",
             "email_verified_expired"=>"datetime",
             "email_verified_at"=>"datetime",
+            "reset_password_expired"=>"datetime",
             "course_type"=>AsEnumCollection::of(CourseTypesEnums::class),
             "gender"=>GenderTypesEnums::class,
         ];

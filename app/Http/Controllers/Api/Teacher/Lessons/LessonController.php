@@ -97,11 +97,16 @@ class LessonController extends Controller
         if (!is_numeric($id) || !$lesson) {
             return failResponse("not found lesson");
         }
-        
+
         (new ImageService())->destroyImage($lesson->logo, "teachers/lessons");
 
+        if ($lesson->contents->count() > 0) {
+            $lesson->contents()->delete();
+        }
+
         $lesson->delete();
-        
+
+
         return successResponse("success delete lesson");
     }
 }

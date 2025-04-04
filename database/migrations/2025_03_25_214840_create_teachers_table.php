@@ -23,6 +23,8 @@ class CreateTeachersTable extends Migration {
 			$table->string("gender")->default(GenderTypesEnums::Male->value);
 			$table->string('qualification', 255)->nullable();
 			$table->text("description")->nullable();
+			$table->timestamp("reset_password_expired")->nullable();
+			$table->string("reset_password_code")->nullable();
 			$table->bigInteger('education_level_id')->unsigned();
 			$table->foreign("education_level_id")->references("id")->on("education_levels")->onDelete("cascade")->onUpdate("cascade");
 			$table->string('cv', 255)->nullable();

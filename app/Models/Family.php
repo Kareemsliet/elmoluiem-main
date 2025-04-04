@@ -23,7 +23,9 @@ class Family extends Authenticatable implements MustVerifyEmail
         "email_verified_expired",
         'education_level_id',
         "description",
-        'profile_image'
+        'profile_image',
+        "reset_password_expired",
+        "reset_password_code",
     ];
     protected $hidden = ['password'];
 
@@ -31,6 +33,7 @@ class Family extends Authenticatable implements MustVerifyEmail
     {
         return [
             "email_verified_at"=>"datetime",
+            "reset_password_expired"=>"datetime",
             "email_verified_expired"=>"datetime",
             "password" => "hashed",
             "gender"=>GenderTypesEnums::class,

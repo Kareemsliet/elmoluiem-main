@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Teacher\Lessons;
 
+use App\Rules\UniqueColumnById;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ContentRequest extends FormRequest
@@ -21,8 +22,10 @@ class ContentRequest extends FormRequest
      */
     public function rules(): array
     {
+        $content=$this->route("content",0);
+
         return [
-            "title"=>"required|string|max:150",
+            "title"=>["required","string","max:150",new UniqueColumnById("contents","title","lessons","contentable_id",$content)],
             "description"=>"required|string|max:250",
         ];
     }

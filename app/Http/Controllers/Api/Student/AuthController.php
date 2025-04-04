@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Student\LoginRequest;
 use App\Http\Requests\Api\Student\RegisterRequest;
-use App\Http\Requests\Api\Student\UpdatePasswordRequest;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -65,19 +64,6 @@ class AuthController extends Controller
         $student->currentAccessToken()->delete();
 
         return successResponse("success logout");
-    }
-
-    public function updatePassword(UpdatePasswordRequest $request)
-    {
-        $request->validated();
-
-        $student = Student::where("email", '=', $request->input("email"))->first();
-
-        $student->update([
-            "password" => $request->input("password"),
-        ]);
-
-        return successResponse("Done! updated password");
     }
 
     public function verifyCode(Request $request)
@@ -139,4 +125,69 @@ class AuthController extends Controller
 
         return successResponse(data: new StudentResource($student));
     }
+
+    public function updatePassword(Request $request)
+    {
+        $validation = validator($request->only(["password","password_confirmation"]), [
+            "password" => "required|min:8|confirmed",
+        ]);
+        
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $parent=$request->user("student");
+
+        $parent->update([
+            "password" => $request->input("password"),
+        ]);
+
+        return successResponse("Done! updated password");
+    }
+
+    public function forgetPassword(Request $request)
+    {
+        $validation = validator($request->only(["email"]), [
+            "email" => "required|email|exists:students,email",
+        ]);
+
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $validation->validated();
+
+        $student = Student::where("email", '=', $request->input("email"))->first();
+
+        (new VerficationService())->sendResetPasswordVerificationCode($student);
+
+        return successResponse("Done! reset password code sent to your email");
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validation = validator($request->only(["code", "password","password_confirmation"]), [
+            "code" => "required|numeric|exists:students,reset_password_code",
+            "password" => "required|min:8|confirmed",
+        ]);
+
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $validation->validated();
+
+        $student = Student::where("reset_password_code", '=', $request->input("code"))->first();
+
+        if (!now()->isBefore($student->reset_password_expired)) {
+            return failResponse("The code is expired");
+        }
+
+        $student->update([
+            "password" => Hash::make($request->input("password")),
+        ]);
+
+        return successResponse("Done! updated password");
+    }
+
 }
