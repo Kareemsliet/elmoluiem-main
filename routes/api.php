@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Family\AuthController as FamilyAuthController;
 use App\Http\Controllers\Api\Teacher\Lessons\ContentsController;
 use App\Http\Controllers\Api\Teacher\Lessons\LecturesController;
 use App\Http\Controllers\Api\Teacher\Lessons\LessonController;
+use App\Http\Controllers\Api\Student\MainController as StudentMainController;
 use Illuminate\Support\Facades\Route;
 
     Route::group(["prefix" => "main"], function () {
@@ -30,6 +31,8 @@ use Illuminate\Support\Facades\Route;
             Route::post("/verification-email/verify",[StudentAuthController::class,"verifyCode"]);
             Route::post('/logout', [StudentAuthController::class, 'logout']);
             Route::group(["middleware"=>"hasVerified"],function(){
+                Route::post("/favourite-subjects/toggle",[StudentMainController::class,"toggleFavouriteSubject"]);
+                Route::get("/favourite-subjects",[StudentMainController::class,"favouriteSubjects"]);                
                 Route::post('/update-password', [StudentAuthController::class, 'updatePassword']);
                 Route::get('/me',[StudentAuthController::class,"profile"]);
                 Route::post("/me",[StudentAuthController::class,"updateProfile"]);

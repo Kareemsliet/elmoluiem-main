@@ -31,9 +31,9 @@ class LectureRequest extends FormRequest
             "video" => $this->when(function () {
                 return $this->getMethod() == "POST";
             }, function () {
-                return "required|mimes:mp4|mimetypes:video/mp4|max:10000";
+                return "required|mimes:mp4|mimetypes:video/mp4|file|max:102400";
             }, function () {
-                return "nullable|mimes:mp4|mimetypes:video/mp4|max:10000";
+                return "nullable|mimes:mp4|mimetypes:video/mp4|file|max:102400";
             }),
         ];
     }

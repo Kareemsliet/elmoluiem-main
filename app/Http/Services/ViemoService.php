@@ -22,7 +22,7 @@ class ViemoService {
             'description' => $description
         ]);
 
-        return $response; // Returns the video URI
+        return $response;
     }
 
     public function deleteVideo($videoUri) {
@@ -34,12 +34,15 @@ class ViemoService {
         }
     }
 
-    public Function videoUrl($videoUrl) {
-        $urlBase="https://vimeo.com";
+    public function getVideoUrl($videoUri)
+    {
+        $response = $this->vimeo->request($videoUri);
         
-        $videoUrl=$urlBase.$videoUrl;
-
-        return $videoUrl;
+        if ($response['status'] == 200) {
+            return $response['body']['link'];
+        }
+        
+        return null;
     }
 
 

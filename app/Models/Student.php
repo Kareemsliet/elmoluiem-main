@@ -47,4 +47,8 @@ class Student extends Authenticatable implements MustVerifyEmail
     public function familes(){
         return $this->belongsToMany(Family::class,"family_student");
     }
+
+    public function subjects(){
+       return $this->belongsToMany(Subject::class,"subject_student","student_id","subject_id")->withTimestamps();
+    }
 }

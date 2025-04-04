@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
 
-class CompressAndStoreVideo implements ShouldQueue
+class ProcessVideo implements ShouldQueue
 {
     use Queueable;
 
