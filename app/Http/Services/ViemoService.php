@@ -54,9 +54,11 @@ class ViemoService
 
     public function getVideoDeuration($videoUri)
     {
-        $response = $this->vimeo->request($videoUri);
+        $response = $this->vimeo->request($videoUri . '?fields=duration,transcode.status');
 
-        if ($response['status'] == 200) {
+        $status = $response['body']['transcode']['status'];
+        
+        if ($status === 'complete') {
             return $response['body']['duration'];
         }
 

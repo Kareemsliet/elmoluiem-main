@@ -123,20 +123,24 @@ class AuthController extends Controller
 
         $student->update($data);
 
+        $favourite_subjects=$request->input("favourite_subjects",[]);
+
+        $student->subjects()->sync($favourite_subjects);
+
         return successResponse(data: new StudentResource($student));
     }
 
     public function updatePassword(Request $request)
     {
-        $validation = validator($request->only(["password","password_confirmation"]), [
+        $validation = validator($request->only(["password", "password_confirmation"]), [
             "password" => "required|min:8|confirmed",
         ]);
-        
+
         if ($validation->fails()) {
             return failResponse($validation->errors()->first());
         }
 
-        $parent=$request->user("student");
+        $parent = $request->user("student");
 
         $parent->update([
             "password" => $request->input("password"),
@@ -166,7 +170,7 @@ class AuthController extends Controller
 
     public function resetPassword(Request $request)
     {
-        $validation = validator($request->only(["code", "password","password_confirmation"]), [
+        $validation = validator($request->only(["code", "password", "password_confirmation"]), [
             "code" => "required|numeric|exists:students,reset_password_code",
             "password" => "required|min:8|confirmed",
         ]);

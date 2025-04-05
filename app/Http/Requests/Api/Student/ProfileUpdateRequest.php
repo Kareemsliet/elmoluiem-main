@@ -32,6 +32,8 @@ class ProfileUpdateRequest extends FormRequest
             "gender"=>"required|in:male,female",
             "description"=>"nullable|string|max:250",
             "profile_image"=>"nullable|image|max:25000|mimes:png,jpg,svg",
+            "favourite_subjects"=>"nullable|array",
+            "favourite_subjects.*"=>"exists:subjects,id",
         ];
     }
 
