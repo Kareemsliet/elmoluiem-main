@@ -1,16 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Api\Teacher\Lessons;
-
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Teacher\Lessons\LectureRequest;
 use App\Http\Resources\ContentLecturesReource;
-use App\Http\Services\ImageService;
 use App\Http\Services\ViemoService;
-use App\Jobs\CompressAndStoreVideo;
 use App\Models\Content;
-use Cloudinary\Api\Upload\UploadApi;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class LecturesController extends Controller
 {
@@ -40,13 +36,7 @@ class LecturesController extends Controller
 
         $request->validated();
 
-        $data = $request->only(["title", "description", "deuration"]);
-
-        $videoPath = $request->file("video")->getRealPath();
-
-        $videoUrl=(new ViemoService())->uploadVideo($videoPath,$data["title"], $data["description"]);
-
-        $data["video"]=$videoUrl;
+        $data = $request->only(["title", "description"]);
 
         $lecture = $content->lectures()->create($data);
 
@@ -92,18 +82,7 @@ class LecturesController extends Controller
             return failResponse("not found lecture");
         }
 
-        $data = $request->only(["title", "description", "deuration"]);
-
-        if ($request->video) {
-
-            (new ViemoService())->deleteVideo($lecture->video);
-
-            $videoPath = $request->file("video")->getRealPath();
-            
-            $videoUrl=(new ViemoService())->uploadVideo($videoPath,$data["title"], $data["description"]);
-
-            $data["video"]=$videoUrl;
-        }
+        $data = $request->only(["title", "description"]);
 
         $lecture->update($data);
 
@@ -127,10 +106,52 @@ class LecturesController extends Controller
             return failResponse("not found lecture");
         }
 
-        (new ViemoService())->deleteVideo($lecture->video);
+        if ($lecture->video) {
+            (new ViemoService())->deleteVideo($lecture->video);
+        }
 
         $lecture->delete();
 
         return successResponse("success delete lecture");
     }
+
+    public function uploadVideo(Request $request,$content_id, $id)
+    {
+        $content = Content::find($content_id);
+
+        if (!is_numeric($content_id) || !$content) {
+            return failResponse("not found content");
+        }
+
+        $lecture = $content->lectures()->find($id);
+
+        if (!is_numeric($id) || !$lecture) {
+            return failResponse("not found lecture");
+        }
+
+        $validation = validator()->make($request->only(["video"]), [
+            "video" => "required|mimes:mp4,mov,avi,wmv|max:20000",
+        ]);
+
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $validation->validated();
+
+        if($lecture->video){
+            (new ViemoService())->deleteVideo($lecture->video);
+        }
+
+        $videoPath = $request->file("video")->getRealPath();
+
+        $videoUrl=(new ViemoService())->uploadVideo($videoPath,$lecture->title, $lecture->description);
+
+        $lecture->update([
+            "video"=>$videoUrl,
+        ]);
+
+        return successResponse("success upload video", new ContentLecturesReource($lecture));
+    }
+
 }

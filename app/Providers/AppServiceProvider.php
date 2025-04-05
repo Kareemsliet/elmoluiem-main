@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        ini_set('memory_limit', '512M',);
+        ini_set('max_execution_time', 300);
+        ini_set('upload_max_filesize', '512M');
+        ini_set('post_max_size', '512M');
+        ini_set('max_file_uploads', '20');
     }
 }

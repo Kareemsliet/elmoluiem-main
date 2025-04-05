@@ -38,7 +38,6 @@ use Illuminate\Support\Facades\Route;
                 Route::post("/me",[StudentAuthController::class,"updateProfile"]);
             });
         });
-
     });
 
 
@@ -79,10 +78,10 @@ use Illuminate\Support\Facades\Route;
                 Route::apiResource("/lessons",LessonController::class);
                 Route::apiResource("/{lesson_id}/contents",ContentsController::class);
                 Route::apiResource("/{content_id}/lectures",LecturesController::class);
+                Route::post("/{content_id}/lectures/{id}/video-upload",[LecturesController::class,"uploadVideo"]);
             });
         });
 
     });
-
     
 

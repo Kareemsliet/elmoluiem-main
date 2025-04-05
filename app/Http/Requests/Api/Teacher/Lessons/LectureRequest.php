@@ -27,14 +27,6 @@ class LectureRequest extends FormRequest
         return [
             "title" => ["required","string","max:100",new UniqueColumnById("lectures",'title',"contents",'content_id',$lecture)],
             "description" => "required|string",
-            "deuration" => "required|integer",
-            "video" => $this->when(function () {
-                return $this->getMethod() == "POST";
-            }, function () {
-                return "required|mimes:mp4|mimetypes:video/mp4|file|max:102400";
-            }, function () {
-                return "nullable|mimes:mp4|mimetypes:video/mp4|file|max:102400";
-            }),
         ];
     }
 

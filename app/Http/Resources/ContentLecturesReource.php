@@ -21,7 +21,7 @@ class ContentLecturesReource extends JsonResource
             "title"=>$this->title,
             "description"=>$this->description,
             "deuration"=>$this->deuration,
-            "video"=> (new ViemoService())->getVideoUrl($this->video),
+            "video"=> $this->video?(new ViemoService())->getVideoUrl($this->video):"",
         ];
     }
 }

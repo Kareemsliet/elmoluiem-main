@@ -15,7 +15,7 @@ class ViemoService {
         );
     }
 
-    public function uploadVideo($filePath,$title,$description) {
+    public function uploadVideo($filePath,$title='',$description="") {
 
         $response = $this->vimeo->upload($filePath, [
             'name' => $title,
@@ -28,9 +28,9 @@ class ViemoService {
     public function deleteVideo($videoUri) {
         try {
             $response = $this->vimeo->request($videoUri, [], 'DELETE');
-            return $response['status'] === 204; // Check if deletion was successful
+            return $response['status'] === 204;
         } catch (\Exception $e) {
-            return $e->getMessage();
+            return failResponse("Error deleting video: " . $e->getMessage());
         }
     }
 
