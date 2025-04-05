@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Api\Student;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\SubjectResource;
-use Illuminate\Http\Request;
 
 class MainController extends Controller
 {
