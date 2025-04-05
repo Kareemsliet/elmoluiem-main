@@ -147,8 +147,11 @@ class LecturesController extends Controller
 
         $videoUrl=(new ViemoService())->uploadVideo($videoPath,$lecture->title, $lecture->description);
 
+        $videoDuration=(new ViemoService())->getVideoDeuration($videoUrl);
+
         $lecture->update([
             "video"=>$videoUrl,
+            "deuration"=>$videoDuration,
         ]);
 
         return successResponse("success upload video", new ContentLecturesReource($lecture));
