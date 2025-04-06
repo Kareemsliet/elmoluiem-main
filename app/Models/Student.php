@@ -17,14 +17,10 @@ class Student extends Authenticatable implements MustVerifyEmail
         'phone',
         "email_verified_at",
         "description",
-        "email_verified_code",
         "education_level_id",
         'address',
-        "email_verified_expired",
         "gender",
         'profile_image',
-        "reset_password_code",
-        "reset_password_expired",
     ];
     protected $hidden = [
         'password'
@@ -32,9 +28,7 @@ class Student extends Authenticatable implements MustVerifyEmail
     protected function casts()
     {
         return [
-            "email_verified_expired"=>"datetime",
             "password" => "hashed",
-            "reset_password_expired"=>"datetime",
             "gender"=>GenderTypesEnums::class,
         ];
     }
@@ -51,4 +45,9 @@ class Student extends Authenticatable implements MustVerifyEmail
     public function subjects(){
        return $this->belongsToMany(Subject::class,"subject_student","student_id","subject_id")->withTimestamps();
     }
+
+    public function verifications(){
+        return $this->morphMany(Verification::class,"verifiable");
+    }
+
 }

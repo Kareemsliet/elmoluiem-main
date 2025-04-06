@@ -20,19 +20,15 @@ class Teacher extends Authenticatable implements MustVerifyEmail
         'password',
         'phone',
         "email_verified_at",
-        "email_verified_code",
         'address',
         "description",
         'profile_image',
         'experince',
         'qualification',
-        "email_verified_expired",
         'cv',
         'course_type',
         "education_level_id",
         "gender",
-        "reset_password_expired",
-        "reset_password_code",
     ];
     protected $hidden = [
         'password'
@@ -41,9 +37,7 @@ class Teacher extends Authenticatable implements MustVerifyEmail
     {
         return [
             "password" => "hashed",
-            "email_verified_expired"=>"datetime",
             "email_verified_at"=>"datetime",
-            "reset_password_expired"=>"datetime",
             "course_type"=>AsEnumCollection::of(CourseTypesEnums::class),
             "gender"=>GenderTypesEnums::class,
         ];
@@ -61,4 +55,7 @@ class Teacher extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Lesson::class,"teacher_id");
     }
 
+    public function verifications(){
+        return $this->morphMany(Verification::class,"verifiable");
+    }
 }

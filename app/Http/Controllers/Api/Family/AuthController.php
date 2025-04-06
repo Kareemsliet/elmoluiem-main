@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Family;
 
+use App\Enums\VerificationTypeEnums;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Family\LoginRequest;
 use App\Http\Requests\Api\Family\ProfileUpdateRequest;
@@ -75,7 +76,7 @@ class AuthController extends Controller
     {
 
         $validation = validator($request->only(["code"]), [
-            "code" => "required|numeric|exists:familes,email_verified_code",
+            "code"=>"required|numeric|min:6",
         ]);
 
         if ($validation->fails()) {
@@ -84,14 +85,29 @@ class AuthController extends Controller
 
         $validation->validated();
 
-        $family = Family::where("email_verified_code", '=', $request->input("code"))->first();
+        $family = Family::whereHas("verifications",function($query)use($request){
+            $query->where([
+                ["type",'=',VerificationTypeEnums::Email],
+                ["code",'=',$request->input("code")],
+                ["uses",'=',0],
+                ["expired_at",'>',now()],
+            ]);
+        })->first();
 
-        if (!now()->isBefore($family->email_verified_expired)) {
-            return failResponse("The code is expired");
+        if(!$family){
+            return failResponse("The code is not valid");
         }
 
         $family->update([
             "email_verified_at" => now(),
+        ]);
+
+        $family->verifications()->where([
+            ["type",'=',VerificationTypeEnums::Email],
+            ["code",'=',$request->input("code")],
+            ["uses",'=',0],
+        ])->update([
+            "uses"=>1,
         ]);
 
         return successResponse("Success Verification Email");
@@ -176,7 +192,7 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $validation = validator($request->only(["code", "password","password_confirmation"]), [
-            "code" => "required|numeric|exists:familes,reset_password_code",
+            "code"=>"required|numeric|min:6",
             "password" => "required|min:8|confirmed",
         ]);
 
@@ -186,14 +202,29 @@ class AuthController extends Controller
 
         $validation->validated();
 
-        $family = Family::where("reset_password_code", '=', $request->input("code"))->first();
+        $family = Family::whereHas("verifications",function($query)use($request){
+            $query->where([
+                ["type",'=',VerificationTypeEnums::Password],
+                ["code",'=',$request->input("code")],
+                ["uses",'=',0],
+                ["expired_at",'>',now()],
+            ]);
+        })->first();
 
-        if (!now()->isBefore($family->reset_password_expired)) {
-            return failResponse("The code is expired");
+        if(!$family){
+            return failResponse("The code is not valid");
         }
 
         $family->update([
             "password" => Hash::make($request->input("password")),
+        ]);
+
+        $family->verifications()->where([
+            ["type",'=',VerificationTypeEnums::Password],
+            ["code",'=',$request->input("code")],
+            ["uses",'=',0],
+        ])->update([
+            "uses"=>1,
         ]);
 
         return successResponse("Done! updated password");

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Teacher;
 
+use App\Enums\VerificationTypeEnums;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Teacher\LoginRequest;
 use App\Http\Requests\Api\Teacher\ProfileUpdateRequest;
@@ -74,7 +75,7 @@ class AuthController extends Controller
     public function verifyCode(Request $request){
         
         $validation=validator($request->only(["code"]),[
-            "code"=>"required|numeric|exists:teachers,email_verified_code",
+            "code"=>"required|numeric|min:6",
         ]);
 
         if($validation->fails()){
@@ -83,14 +84,29 @@ class AuthController extends Controller
 
         $validation->validated();
 
-        $teacher=Teacher::where("email_verified_code",'=',$request->input("code"))->first();
+        $teacher=Teacher::whereHas("verifications",function($query)use($request){
+            $query->where([
+                ["type",'=',VerificationTypeEnums::Email],
+                ["code",'=',$request->input("code")],
+                ["uses",'=',0],
+                ["expired_at",'>',now()],
+            ]);
+        })->first();
 
-        if(!now()->isBefore($teacher->email_verified_expired)){
-            return failResponse("The code is expired");
+        if(!$teacher){
+            return failResponse("The code is not valid");
         }
 
         $teacher->update([
             "email_verified_at"=>now(),
+        ]);
+
+        $teacher->verifications()->where([
+            ["type",'=',VerificationTypeEnums::Email],
+            ["code",'=',$request->input("code")],
+            ["uses",'=',0],
+        ])->update([
+            "uses"=>1,
         ]);
 
         return successResponse("Success Verification Email");
@@ -182,7 +198,7 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $validation = validator($request->only(["code", "password","password_confirmation"]), [
-            "code" => "required|numeric|exists:teachers,reset_password_code",
+            "code"=>"required|numeric|min:6",
             "password" => "required|min:8|confirmed",
         ]);
 
@@ -192,14 +208,29 @@ class AuthController extends Controller
 
         $validation->validated();
 
-        $teacher = Teacher::where("reset_password_code", '=', $request->input("code"))->first();
+        $teacher = Teacher::whereHas("verifications",function($query)use($request){
+            $query->where([
+                ["type",'=',VerificationTypeEnums::Password],
+                ["code",'=',$request->input("code")],
+                ["uses",'=',0],
+                ["expired_at",'>',now()],
+            ]);
+        })->first();
 
-        if (!now()->isBefore($teacher->reset_password_expired)) {
-            return failResponse("The code is expired");
+        if (!$teacher) {
+            return failResponse("The code is not valid");
         }
 
         $teacher->update([
             "password" => Hash::make($request->input("password")),
+        ]);
+
+        $teacher->verifications()->where([
+            ["type",'=',VerificationTypeEnums::Password],
+            ["code",'=',$request->input("code")],
+            ["uses",'=',0],
+        ])->update([
+            "uses"=>1,
         ]);
 
         return successResponse("Done! updated password");
