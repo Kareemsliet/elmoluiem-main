@@ -51,7 +51,7 @@ class Student extends Authenticatable implements MustVerifyEmail
     }
 
     public function teacherRatings(){
-        return $this->morphToMany(Teacher::class,"ratable","teacher_ratings")->withPivot("rate","description")->withTimestamps();  
+        return $this->morphToMany(Teacher::class,"rateable","teacher_ratings")->withPivot("rate","description")->withTimestamps();  
     }
 
     public function teacherRatingsAboutMe(){

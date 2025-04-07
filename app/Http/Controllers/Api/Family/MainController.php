@@ -16,42 +16,45 @@ class MainController extends Controller
         $this->family = auth("family")->user();
     }
 
-    public function rateTeacher(RatingRequest $request,$teacher_id){
-
+    public function rateTeacher(RatingRequest $request, $teacher_id)
+    {
         $request->validated();
 
-        $teacher=Teacher::find($teacher_id);
+        $teacher = Teacher::find($teacher_id);
 
         if (!is_numeric($teacher_id) || !$teacher) {
             return failResponse("not found teacher");
         }
 
-        $this->family->teacherRatings()->attach($teacher_id,[
-            "rate"=>$request->rate,
-            "description"=>$request->description,
+        $this->family->teacherRatings()->attach($teacher_id, [
+            "rate" => $request->rate,
+            "description" => $request->description,
         ]);
 
         return successResponse("success add rate");
     }
+    public function studentsRatings()
+    {
+        $students=$this->family->students->pluck("id")->toArray();
 
-    public function studentsRatings(){
-
-
-        $studentsRatings=[];
-
-        $this->family->students->map(function($item)use($studentsRatings){
-            $item->teacherRatingsAboutMe()->orderByPivot("created_at")->get()->map(function($rating)use($studentsRatings){
-                return $studentsRatings[]=$rating;
-            });
+        $ratings=Teacher::all()->map(function($item)use($students){
+            return $item->studentRatings()->whereIn("students.id",$students)->get();
+        })->flatten()
+        ->sortByDesc(function($item){
+            $item->pivot->created_at;
         });
 
-        return successResponse(data:RatingResource::collection($studentsRatings));
+        return successResponse(data: RatingResource::collection($ratings));
     }
+    public function allRatings()
+    {
+        $ratings=Teacher::all()->map(function($item){
+            return $item->familyRatingsAboutMe()->where("familes.id",$this->family->id)->get();
+        })->flatten()
+        ->sortByDesc(function($item){
+            $item->pivot->created_at;
+        });
 
-    public function allRatings(){
-        $ratings=$this->family->teacherRatings()->orderByPivot("created_at","desc")->get();
-        
-        return successResponse(data:RatingResource::collection($ratings));
+        return successResponse(data: RatingResource::collection($ratings));
     }
-
 }
