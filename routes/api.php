@@ -8,6 +8,9 @@ use App\Http\Controllers\Api\Teacher\Lessons\ContentsController;
 use App\Http\Controllers\Api\Teacher\Lessons\LecturesController;
 use App\Http\Controllers\Api\Teacher\Lessons\LessonController;
 use App\Http\Controllers\Api\Student\MainController as StudentMainController;
+use App\Http\Controllers\Api\Teacher\MainController as TeacherMainController;
+use App\Http\Controllers\Api\Family\MainController as FamilyMainController;
+
 use Illuminate\Support\Facades\Route;
 
     Route::group(["prefix" => "main"], function () {
@@ -34,6 +37,11 @@ use Illuminate\Support\Facades\Route;
                 Route::post('/update-password', [StudentAuthController::class, 'updatePassword']);
                 Route::get('/me',[StudentAuthController::class,"profile"]);
                 Route::post("/me",[StudentAuthController::class,"updateProfile"]);
+                Route::group(["prefix"=>"rating"],function(){
+                    Route::post("/rate/{teacher_id}",[StudentMainController::class,"rateTeacher"]);
+                    Route::post("/rate/{lecture_id}",[StudentMainController::class,"rateLecture"]);
+                    Route::get("/all",[StudentMainController::class,"allRatings"]);             
+                });
             });
         });
     });
@@ -53,9 +61,13 @@ use Illuminate\Support\Facades\Route;
                 Route::post('/update-password', [FamilyAuthController::class, 'updatePassword']);
                 Route::get('/me',[FamilyAuthController::class,"profile"]);
                 Route::post("/me",[FamilyAuthController::class,"updateProfile"]);
+                Route::group(["prefix"=>"ratings"],function(){
+                    Route::get("/all",[FamilyMainController::class,"allRatings"]);
+                    Route::post("/{teacher_id}",[FamilyMainController::class,"rateTeacher"]);
+                    Route::get("/students-ratings",[FamilyMainController::class,"studentsRatings"]);
+                });
             });
         });
-
     });
 
 
@@ -77,6 +89,10 @@ use Illuminate\Support\Facades\Route;
                 Route::apiResource("/{lesson_id}/contents",ContentsController::class);
                 Route::apiResource("/{content_id}/lectures",LecturesController::class);
                 Route::post("/{content_id}/lectures/{id}/video-upload",[LecturesController::class,"uploadVideo"]);
+                Route::group(["prefix"=>"ratings"],function(){
+                    Route::post("/{student_id}",[TeacherMainController::class,"rateStudent"]);
+                    Route::get("/all",[TeacherMainController::class,"allRatings"]);
+                });
             });
         });
 

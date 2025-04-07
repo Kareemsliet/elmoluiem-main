@@ -50,4 +50,8 @@ class Student extends Authenticatable implements MustVerifyEmail
         return $this->morphMany(Verification::class,"verifiable");
     }
 
+    public function ratings(){
+        return $this->morphMany(Rating::class,"rateable",);  
+    }
+
 }

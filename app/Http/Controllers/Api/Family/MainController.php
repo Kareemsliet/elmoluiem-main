@@ -1,23 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\Api\Student;
+namespace App\Http\Controllers\Api\Family;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class MainController extends Controller
 {
-    public $student;
+    public $family;
 
     public function __construct()
     {
-        $this->student = auth("student")->user();
+        $this->family = auth("family")->user();
     }
 
     public function rateTeacher(){
 
     }
 
-    public function rateLecture(){
+    public function studentsRatings(){
 
     }
 
