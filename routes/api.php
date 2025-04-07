@@ -47,7 +47,7 @@ use Illuminate\Support\Facades\Route;
 
 
     Route::group(["prefix" => "parent"], function () {
-        
+
         Route::post('/register', [FamilyAuthController::class, 'register']);
         Route::post('/login', [FamilyAuthController::class, 'login']);
         Route::post("/forget-password",[FamilyAuthController::class,"forgetPassword"])->middleware("throttleApi:1,1");
@@ -71,7 +71,7 @@ use Illuminate\Support\Facades\Route;
 
 
     Route::group(["prefix" => "teacher"], function () {
-        
+
         Route::post('/register', [TeacherAuthController::class, 'register']);
         Route::post('/login', [TeacherAuthController::class, 'login']);
         Route::post("/forget-password",[TeacherAuthController::class,"forgetPassword"])->middleware("throttleApi:1,1");
@@ -96,5 +96,9 @@ use Illuminate\Support\Facades\Route;
         });
 
     });
+<<<<<<< HEAD
+
+=======
     
+>>>>>>> cd0422181d97ce2276c8e141203957b5001f05d8
 
