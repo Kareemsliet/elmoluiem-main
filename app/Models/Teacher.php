@@ -71,8 +71,4 @@ class Teacher extends Authenticatable implements MustVerifyEmail
     public function studentRatings(){
        return $this->morphToMany(Student::class,"rateable","student_rating")->withPivot("rate","description")->withTimestamps();
     }
-
-    public function recievedRatings(){
-        return collect([$this->studentRatingsAboutMe,$this->familyRatingsAboutMe])->flatten()->sortByDesc("created_at");
-    }
 }

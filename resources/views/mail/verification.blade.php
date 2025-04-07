@@ -88,16 +88,10 @@
 
         <div class="content">
             <p>Hello</p>
-<<<<<<< HEAD
 
             <p>Thank you for registering with El Molium. To complete your registration, please verify your email address
                 by entering the following verification code:</p>
 
-=======
-            
-            <p>Thank you for registering with Elmullim. To complete your registration, please verify your email address by entering the following verification code:</p>
-            
->>>>>>> cd0422181d97ce2276c8e141203957b5001f05d8
             <div class="verification-code">
                 {{ $code }}
             </div>

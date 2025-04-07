@@ -32,20 +32,20 @@ class MainController extends Controller
             "description" => $request->description,
         ]);
 
-        return successResponse("success rate student");
+        return successResponse("success add rate");
     }
 
     public function allReceivedRatings()
     {
-       $receivesRatings = $this->teacher->recievedRatings();
+       $receivesRatings = collect([$this->teacher->studentRatingsAboutMe,$this->teacher->familyRatingsAboutMe])->flatten()->sortByDesc("created_at");
 
        return successResponse(data:RatingResource::collection($receivesRatings));
     }
 
     public function allGivenRatings()
     {
-       $givenRatings = $this->teacher->studentRatings()->orderByPivot("created_at","desc")->get();
+        $givenRatings = $this->teacher->studentRatings()->orderByPivot("created_at","desc")->get();
 
-         return successResponse(data:RatingResource::collection($givenRatings));
+        return successResponse(data:RatingResource::collection($givenRatings));
     }
 }
