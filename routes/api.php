@@ -96,9 +96,3 @@ use Illuminate\Support\Facades\Route;
         });
 
     });
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> cd0422181d97ce2276c8e141203957b5001f05d8
-
