@@ -39,8 +39,7 @@ use Illuminate\Support\Facades\Route;
                 Route::post("/me",[StudentAuthController::class,"updateProfile"]);
                 Route::group(["prefix"=>"rating"],function(){
                     Route::post("/rate/{teacher_id}",[StudentMainController::class,"rateTeacher"]);
-                    Route::post("/rate/{lecture_id}",[StudentMainController::class,"rateLecture"]);
-                    Route::get("/all",[StudentMainController::class,"allRatings"]);             
+                    Route::get("/all",[StudentMainController::class,"allRatings"]);           
                 });
             });
         });

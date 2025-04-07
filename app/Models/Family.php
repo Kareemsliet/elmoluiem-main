@@ -46,7 +46,7 @@ class Family extends Authenticatable implements MustVerifyEmail
         return $this->morphMany(Verification::class,"verifiable");
     }
 
-    public function ratings(){
-        return $this->morphMany(Rating::class,"rateable",);  
+    public function teacherRatings(){
+        return $this->morphToMany(Teacher::class,"ratable","teacher_ratings")->withPivot("rate","description")->withTimestamps();  
     }
 }

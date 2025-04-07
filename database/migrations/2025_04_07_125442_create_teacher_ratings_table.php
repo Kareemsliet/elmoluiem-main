@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ratings', function (Blueprint $table) {
+        Schema::create('teacher_ratings', function (Blueprint $table) {
             $table->id();
             $table->integer("rate")->default(1);
             $table->text("description")->nullable();
+            $table->bigInteger("teacher_id")->unsigned();
+            $table->foreign("teacher_id")->references("id")->on("teachers")->onDelete("cascade")->onUpdate("cascade");
             $table->morphs("rateable");
             $table->timestamps();
         });
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ratings');
+        Schema::dropIfExists('teacher_ratings');
     }
 };
