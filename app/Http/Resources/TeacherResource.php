@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -23,7 +24,8 @@ class TeacherResource extends JsonResource
             "description"   =>$this->description,
             'experince'     => $this->experince,
             'qualification' => $this->qualification,
-            'cv'            => $this->cv,
+            "cv"=>$this->cv?(new ImageService())->imageUrlToBase64("teachers/$this->cv"):"",
+            "profile_image"=>$this->profile_image?(new ImageService())->imageUrlToBase64("teachers/$this->profile_image"):"",
             "education_level" => new EducationLevelResource($this->educationLevel),
             'course_types'   => $this->course_type,
             "gender"=>$this->gender->value,

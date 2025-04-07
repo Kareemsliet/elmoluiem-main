@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Api\Student;
+namespace App\Http\Requests\Api\Main;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdatePasswordRequest extends FormRequest
+class RatingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,8 @@ class UpdatePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "email"=>"required|string|exists:students,email",
-            "password"=>"required|confirmed|min:8",
+            "rate"=>"required|integer|numeric|min:1|max:5",
+            "description"=>"required|string|max:150",
         ];
     }
 

@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Api\Family;
+namespace App\Http\Requests\Api\Teacher\Lessons;
+
+use App\Rules\UniqueColumnById;
 use Illuminate\Foundation\Http\FormRequest;
 
-class PasswordUpdateRequest extends FormRequest
+class ContentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,9 +22,11 @@ class PasswordUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $content=$this->route("content",0);
+
         return [
-            "email"=>"required|string|exists:familes,email",
-            "password"=>"required|confirmed|min:8",
+            "title"=>["required","string","max:150",new UniqueColumnById("contents","title","lessons","contentable_id",$content)],
+            "description"=>"required|string|max:250",
         ];
     }
 

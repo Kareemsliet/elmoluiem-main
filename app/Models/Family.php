@@ -17,12 +17,11 @@ class Family extends Authenticatable implements MustVerifyEmail
         'password',
         'email',
         "email_verified_at",
-        "email_verified_code",
         'phone',
         "gender",
-        "email_verified_expired",
         'education_level_id',
-        'profile_image'
+        "description",
+        'profile_image',
     ];
     protected $hidden = ['password'];
 
@@ -30,13 +29,12 @@ class Family extends Authenticatable implements MustVerifyEmail
     {
         return [
             "email_verified_at"=>"datetime",
-            "email_verified_expired"=>"datetime",
             "password" => "hashed",
             "gender"=>GenderTypesEnums::class,
         ];
     }
 
-    public function eucationLevel(){
+    public function educationLevel(){
         return $this->belongsTo(EducationLevel::class,"education_level_id");
     }
 
@@ -44,4 +42,11 @@ class Family extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Student::class,"family_student");
     }
 
+    public function verifications(){
+        return $this->morphMany(Verification::class,"verifiable");
+    }
+
+    public function ratings(){
+        return $this->morphMany(Rating::class,"rateable",);  
+    }
 }

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
 use App\Http\Resources\EducationSystemResource;
 use App\Http\Resources\SubjectResource;
 use App\Http\Services\VerficationService;
@@ -10,7 +9,6 @@ use App\Http\Controllers\Controller;
 use App\Models\EducationLevel;
 use App\Models\EducationSystem;
 use App\Http\Resources\CountryResource;
-use App\Http\Resources\AcademicYearResource;
 use App\Http\Resources\EducationLevelResource;
 use Illuminate\Http\Request;
 
@@ -102,5 +100,4 @@ class MainController extends Controller
 
         return successResponse("Success Send  verification Code at your email box");
     }
-
 }

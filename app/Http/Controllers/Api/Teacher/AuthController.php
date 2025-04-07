@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api\Teacher;
 
+use App\Enums\VerificationTypeEnums;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Teacher\LoginRequest;
+use App\Http\Requests\Api\Teacher\ProfileUpdateRequest;
 use App\Http\Requests\Api\Teacher\RegisterRequest;
-use App\Http\Requests\Api\Teacher\UpdatePasswordRequest;
 use App\Http\Resources\TeacherResource;
+use App\Http\Services\ImageService;
 use App\Http\Services\VerficationService;
 use App\Models\Subject;
 use App\Models\Teacher;
@@ -70,23 +72,10 @@ class AuthController extends Controller
         return successResponse("success logout");
     }
 
-    public function updatePassword(UpdatePasswordRequest $request)
-    {
-        $request->validated();
-
-        $teacher=Teacher::where("email",'=',$request->input("email"))->first();
-
-        $teacher->update([
-            "password"=>$request->input("password"),
-        ]);
-
-        return successResponse("Done! updated password");
-    }
-
     public function verifyCode(Request $request){
         
         $validation=validator($request->only(["code"]),[
-            "code"=>"required|numeric|exists:teachers,email_verified_code",
+            "code"=>"required|numeric|min:6",
         ]);
 
         if($validation->fails()){
@@ -95,17 +84,156 @@ class AuthController extends Controller
 
         $validation->validated();
 
-        $teacher=Teacher::where("email_verified_code",'=',$request->input("code"))->first();
+        $teacher=Teacher::whereHas("verifications",function($query)use($request){
+            $query->where([
+                ["type",'=',VerificationTypeEnums::Email],
+                ["code",'=',$request->input("code")],
+                ["uses",'=',0],
+                ["expired_at",'>',now()],
+            ]);
+        })->first();
 
-        if(!now()->isBefore($teacher->email_verified_expired)){
-            return failResponse("The code is expired");
+        if(!$teacher){
+            return failResponse("The code is not valid");
         }
 
         $teacher->update([
             "email_verified_at"=>now(),
         ]);
 
+        $teacher->verifications()->where([
+            ["type",'=',VerificationTypeEnums::Email],
+            ["code",'=',$request->input("code")],
+            ["uses",'=',0],
+        ])->update([
+            "uses"=>1,
+        ]);
+
         return successResponse("Success Verification Email");
+    }
+
+    public function profile(Request $request)
+    {
+        $teacher = $request->user("teacher");
+
+        return successResponse(data:new TeacherResource($teacher));
+    }
+
+    public function updateProfile(ProfileUpdateRequest $request)
+    {
+        $request->validated();
+
+        $teacher = $request->user("teacher");
+
+        $data = $request->only(["name", "email", "address", 'phone', "education_level_id", "gender","description","qualification","experince"]);
+
+        if ($request->profile_image) {
+            if ($teacher->profile_image) {
+                (new ImageService())->destroyImage($teacher->profile_image, "teachers");
+            }
+            $data["profile_image"] = (new ImageService())->uploadImage($request->file("profile_image"), "teachers");
+        }
+
+        if ($request->cv) {
+            if ($teacher->cv) {
+                (new ImageService())->destroyImage($teacher->cv, "teachers");
+            }
+            $data["cv"] = (new ImageService())->uploadImage($request->file("cv"), "teachers");
+        }
+
+        if ($data["email"] != $teacher->email) {
+        
+            $data["email_verified_at"] = null;
+        
+            (new VerficationService())->sendEmailVerificationCode($teacher);
+        }
+
+        $teacher->update($data);
+
+        $subjects=Subject::whereIn("id",$request->subjects)->get()->pluck("id")->toArray();
+
+        $teacher->subjects()->sync($subjects);
+
+        return successResponse(data:new TeacherResource($teacher));
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $validation = validator($request->only(["password","password_confirmation"]), [
+            "password" => "required|min:8|confirmed",
+        ]);
+        
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $parent=$request->user("teacher");
+
+        $parent->update([
+            "password" => $request->input("password"),
+        ]);
+
+        return successResponse("Done! updated password");
+    }
+
+    public function forgetPassword(Request $request)
+    {
+        $validation = validator($request->only(["email"]), [
+            "email" => "required|email|exists:teachers,email",
+        ]);
+
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $validation->validated();
+
+        $teacher = Teacher::where("email", '=', $request->input("email"))->first();
+
+        (new VerficationService())->sendResetPasswordVerificationCode($teacher);
+
+        return successResponse("Done! reset password code sent to your email");
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validation = validator($request->only(["code", "password","password_confirmation"]), [
+            "code"=>"required|numeric|min:6",
+            "password" => "required|min:8|confirmed",
+        ]);
+
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $validation->validated();
+
+        $teacher = Teacher::whereHas("verifications",function($query)use($request){
+            $query->where([
+                ["type",'=',VerificationTypeEnums::Password],
+                ["code",'=',$request->input("code")],
+                ["uses",'=',0],
+                ["expired_at",'>',now()],
+            ]);
+        })->first();
+
+        if (!$teacher) {
+            return failResponse("The code is not valid");
+        }
+
+        $teacher->update([
+            "password" => Hash::make($request->input("password")),
+        ]);
+
+        $teacher->verifications()->where([
+            ["type",'=',VerificationTypeEnums::Password],
+            ["code",'=',$request->input("code")],
+            ["uses",'=',0],
+        ])->update([
+            "uses"=>1,
+        ]);
+
+        return successResponse("Done! updated password");
     }
 
 }
