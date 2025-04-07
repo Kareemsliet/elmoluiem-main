@@ -33,7 +33,7 @@ use Illuminate\Support\Facades\Route;
 
 
     Route::group(["prefix" => "parent"], function () {
-        
+
         Route::post('/register', [FamilyAuthController::class, 'register']);
         Route::post('/login', [FamilyAuthController::class, 'login']);
         Route::post('/update-password', [FamilyAuthController::class, 'updatePassword']);
@@ -49,7 +49,7 @@ use Illuminate\Support\Facades\Route;
 
 
     Route::group(["prefix" => "teacher"], function () {
-        
+
         Route::post('/register', [TeacherAuthController::class, 'register']);
         Route::post('/login', [TeacherAuthController::class, 'login']);
         Route::post('/update-password', [TeacherAuthController::class, 'updatePassword']);
@@ -60,8 +60,7 @@ use Illuminate\Support\Facades\Route;
                 Route::post('/logout', [TeacherAuthController::class, 'logout']);
             });
         });
-    
+
     });
 
-    
 
