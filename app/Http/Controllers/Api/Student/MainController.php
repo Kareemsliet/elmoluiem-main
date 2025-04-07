@@ -14,19 +14,19 @@ class MainController extends Controller
         $this->student = auth("student")->user();
     }
 
-    public function rateTeacher(RatingRequest $rquest){
+    public function rateTeacher(RatingRequest $rquest,$teacher_id){
         $rquest->validated();
         
         //post
     }
 
-    public function rateLecture(RatingRequest $request){
+    public function allGivenRatings(RatingRequest $request){
         $request->validated();
         
         //post
     }
 
-    public function allRatings(){
+    public function allReceivedRatings(){
         // get
     }
 }

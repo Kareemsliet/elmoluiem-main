@@ -15,7 +15,7 @@ class MainController extends Controller
         $this->family = auth("family")->user();
     }
 
-    public function rateTeacher(RatingRequest $request,$teacher){
+    public function rateTeacher(RatingRequest $request,$teacher_id){
         
         $request->validated();
 

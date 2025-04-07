@@ -15,7 +15,7 @@ class MainController extends Controller
         $this->teacher = auth("teacher")->user();
     }
 
-    public function rateStudent(RatingRequest $request)
+    public function rateStudent(RatingRequest $request,$student_id)
     {
         $request->validated();
 
@@ -24,10 +24,18 @@ class MainController extends Controller
         // Implement the logic to rate a lecture
     }
 
-    public function allRatings()
+    public function allReceivedRatings()
     {
         // get
 
         // Implement the logic to rate a lecture
     }
+
+    public function allGivenRatings()
+    {
+        //get
+
+        // Implement the logic to rate a lecture
+    }
+
 }

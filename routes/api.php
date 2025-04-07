@@ -38,8 +38,9 @@ use Illuminate\Support\Facades\Route;
                 Route::get('/me',[StudentAuthController::class,"profile"]);
                 Route::post("/me",[StudentAuthController::class,"updateProfile"]);
                 Route::group(["prefix"=>"rating"],function(){
-                    Route::post("/rate/{teacher_id}",[StudentMainController::class,"rateTeacher"]);
-                    Route::get("/all",[StudentMainController::class,"allRatings"]);           
+                    Route::post("/{teacher_id}/rate",[StudentMainController::class,"rateTeacher"]);
+                    Route::get("/given-all",[StudentMainController::class,"allGivenRatings"]);
+                    Route::get("/received-all",[StudentMainController::class,"allReceivedRatings"]);           
                 });
             });
         });
@@ -62,8 +63,8 @@ use Illuminate\Support\Facades\Route;
                 Route::post("/me",[FamilyAuthController::class,"updateProfile"]);
                 Route::group(["prefix"=>"ratings"],function(){
                     Route::get("/all",[FamilyMainController::class,"allRatings"]);
-                    Route::post("/{teacher_id}",[FamilyMainController::class,"rateTeacher"]);
-                    Route::get("/students-ratings",[FamilyMainController::class,"studentsRatings"]);
+                    Route::post("/{teacher_id}/rate",[FamilyMainController::class,"rateTeacher"]);
+                    Route::get("/my-students/ratings",[FamilyMainController::class,"studentsRatings"]);
                 });
             });
         });
@@ -89,10 +90,10 @@ use Illuminate\Support\Facades\Route;
                 Route::apiResource("/{content_id}/lectures",LecturesController::class);
                 Route::post("/{content_id}/lectures/{id}/video-upload",[LecturesController::class,"uploadVideo"]);
                 Route::group(["prefix"=>"ratings"],function(){
-                    Route::post("/{student_id}",[TeacherMainController::class,"rateStudent"]);
-                    Route::get("/all",[TeacherMainController::class,"allRatings"]);
+                    Route::post("/{student_id}/rate",[TeacherMainController::class,"rateStudent"]);
+                    Route::get("/given-all",[TeacherMainController::class,"allGivenRatings"]);
+                    Route::get("/received-all",[TeacherMainController::class,"allReceivedRatings"]);
                 });
             });
         });
-
     });
