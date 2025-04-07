@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Teacher;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Main\RatingRequest;
+use App\Http\Resources\RatingResource;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
 class MainController extends Controller
@@ -19,23 +21,31 @@ class MainController extends Controller
     {
         $request->validated();
 
-        //post
+        $student=Student::find($student_id);
 
-        // Implement the logic to rate a lecture
+        if (!is_numeric($student_id) || !$student) {
+            return failResponse("not found student");
+        }
+
+        $this->teacher->studentRatings()->attach($student_id, [
+            "rate" => $request->rate,
+            "description" => $request->description,
+        ]);
+
+        return successResponse("success rate student");
     }
 
     public function allReceivedRatings()
     {
-        // get
+       $receivesRatings = $this->teacher->recievedRatings();
 
-        // Implement the logic to rate a lecture
+       return successResponse(data:RatingResource::collection($receivesRatings));
     }
 
     public function allGivenRatings()
     {
-        //get
+       $givenRatings = $this->teacher->studentRatings()->orderByPivot("created_at","desc")->get();
 
-        // Implement the logic to rate a lecture
+         return successResponse(data:RatingResource::collection($givenRatings));
     }
-
 }

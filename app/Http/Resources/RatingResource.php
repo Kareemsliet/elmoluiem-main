@@ -16,23 +16,15 @@ class RatingResource extends JsonResource
     public function toArray(Request $request): array
     {
         $folderPath="";
-
-        if($this->rateable_type=="App\Models\Teacher"){
-            $folderPath="teachers";
-        }elseif($this->rateable_type=="App\Models\Student"){
-            $folderPath="students";
-        }else{
-            $folderPath="familes";
-        }
         
         return [
             "reateable"=>[
-                "name"=>$this->rateable->name,
-                "image"=>$this->rateable->profile_image?(new ImageService())->imageUrlToBase64($folderPath.'/'.$this->rateable->profile_image):"",
+                "name"=>$this->name,
+                "image"=>$this->profile_image?(new ImageService())->imageUrlToBase64($folderPath.'/'.$this->profile_image):"",
             ],
-            "rate"=>$this->rate,
-            "description"=>$this->description,
-            "created_at"=>$this->created_at,
+            "rate"=>$this->pivot->rate,
+            "description"=>$this->pivot->description,
+            "created_at"=>$this->pivot->created_at,
         ];
     }
 }

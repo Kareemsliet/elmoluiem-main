@@ -19,7 +19,7 @@ class MainController extends Controller
         
         $request->validated();
 
-        //post
+        
 
     }
 

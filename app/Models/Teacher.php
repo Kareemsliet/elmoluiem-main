@@ -4,6 +4,7 @@ namespace App\Models;
 use App\Enums\CourseTypesEnums;
 use App\Enums\GenderTypesEnums;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -68,6 +69,10 @@ class Teacher extends Authenticatable implements MustVerifyEmail
     }
 
     public function studentRatings(){
-       return $this->morphToMany(Student::class,"student_rating")->withPivot("rate","description")->withTimestamps();
+       return $this->morphToMany(Student::class,"rateable","student_rating")->withPivot("rate","description")->withTimestamps();
+    }
+
+    public function recievedRatings(){
+        return collect([$this->studentRatingsAboutMe,$this->familyRatingsAboutMe])->flatten()->sortByDesc("created_at");
     }
 }
