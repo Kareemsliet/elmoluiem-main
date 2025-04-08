@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Student;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Main\RatingRequest;
 use App\Http\Resources\RatingResource;
-use App\Models\Student;
 use App\Models\Teacher;
 
 class MainController extends Controller
@@ -39,7 +38,7 @@ class MainController extends Controller
     public function allGivenRatings()
     {
         $ratings = Teacher::all()->map(function ($item) {
-            $item->studentRatingsAboutMe()->where("students.id", '=', $this->student->id)->get();
+         return  $item->studentRatingsAboutMe()->where("students.id", '=', $this->student->id)->get();
         })
         ->flatten()
         ->sortByDesc(function ($item) {
