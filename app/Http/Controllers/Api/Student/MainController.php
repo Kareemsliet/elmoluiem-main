@@ -39,7 +39,7 @@ class MainController extends Controller
     public function allGivenRatings()
     {
         $ratings = Teacher::all()->map(function ($item) {
-           return  $item->studentRatingsAboutMe()->where("students.id", '=', $this->student->id)->get();
+            $item->studentRatingsAboutMe()->where("students.id", '=', $this->student->id)->get();
         })
         ->flatten()
         ->sortByDesc(function ($item) {
