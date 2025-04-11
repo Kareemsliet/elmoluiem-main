@@ -57,6 +57,8 @@ Route::group(["prefix" => "student"], function () {
             Route::group(["prefix" => "enrolling"], function () {
                 Route::get("/lessons", [StudentMainController::class, "enrollingLessons"]);
                 Route::get("/courses", [StudentMainController::class, "enrollingCourses"]);
+                Route::post("/lessons/{lesson_id}/enroll", [StudentMainController::class, "enrollLesson"]);
+                Route::post("/courses/{course_id}/enroll", [StudentMainController::class, "enrollCourse"]);
             });
         });
     });

@@ -10,6 +10,7 @@ use App\Http\Resources\CourseResource;
 use App\Http\Resources\LessonReource;
 use App\Http\Resources\RatingResource;
 use App\Http\Services\PaymobService;
+use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Teacher;
 use App\Models\Transaction;
@@ -91,7 +92,8 @@ class MainController extends Controller
         }
 
         if ($request->input("orderable_type") == "courses") {
-            $orderable = Lesson::find($request->input("orderable_id"));
+
+            $orderable = Course::find($request->input("orderable_id"));
 
             $enrolled = $this->student->enrollingCourses()
                 ->where("courses.id", "=", $request->input("orderable_id"))
@@ -156,7 +158,7 @@ class MainController extends Controller
             $total = $order->amount;
 
             if ($orderable->getTable() == "lessons") {
-                
+
                 $commission = 0.10;
 
                 $teacher_amount = $total - ($total * $commission);
@@ -177,7 +179,7 @@ class MainController extends Controller
                     "commission" => 0.0,
                 ]);
             }
-            
+
         });
 
         return successResponse("payment success and you are enrolled in this course");
@@ -196,4 +198,54 @@ class MainController extends Controller
 
         return successResponse(data: CourseResource::collection($enrollingCourses));
     }
+
+    public function enrollLesson($lesson_id)
+    {
+
+        $lsesson = Lesson::find($lesson_id);
+
+        if (!$lsesson || !is_numeric($lesson_id)) {
+            return failResponse("not found lesson");
+        }
+
+        $existsLesson = $this->student->enrollingLessons()->where("lessons.id", "=", $lesson_id)->exists();
+
+        if ($existsLesson) {
+            return failResponse("you are already enrolled in this lesson");
+        }
+
+        if ((int) $lsesson->price > 0) {
+            return failResponse("this lesson is paid lesson");
+        }
+
+        $this->student->enrollingLessons()->attach($lesson_id);
+
+        return successResponse("success enroll in this lesson");
+    }
+
+    public function enrollCourse($course_id)
+    {
+
+        $course = Course::find($course_id);
+
+        if (!$course || !is_numeric($course_id)) {
+            return failResponse("not found course");
+        }
+
+        $existsCourse = $this->student->enrollingCourses()->where("courses.id", "=", $course_id)->exists();
+
+        if ($existsCourse) {
+            return failResponse("you are already enrolled in this course");
+        }
+
+        if ((int) $course->price > 0) {
+            return failResponse("this course is paid course");
+        }
+
+        $this->student->enrollingCourses()->attach($course->id);
+
+        return successResponse("success enroll in this course");
+    }
+
+
 }

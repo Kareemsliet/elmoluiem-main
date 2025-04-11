@@ -28,6 +28,8 @@ class PaymentInitiateRequest extends FormRequest
             "orderable_id" => $this->whenHas("orderable_type", function(){
                 if ($this->input("orderable_type") == "lessons") {
                     return "required|exists:lessons,id|numeric";
+                }else{
+                    return "required|exists:courses,id|numeric";
                 }
             },function(){
                 return "required|numeric";
