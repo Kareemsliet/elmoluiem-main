@@ -246,6 +246,4 @@ class MainController extends Controller
 
         return successResponse("success enroll in this course");
     }
-
-
 }
