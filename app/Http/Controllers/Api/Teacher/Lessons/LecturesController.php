@@ -145,12 +145,12 @@ class LecturesController extends Controller
 
         $videoPath = $request->file("video")->getRealPath();
 
-        $videoUrl=(new ViemoService())->uploadVideo($videoPath,$lecture->title, $lecture->description);
+        $videoId=(new ViemoService())->uploadVideo($videoPath,$lecture->title, $lecture->description);
 
-        $videoDuration=(new ViemoService())->getVideoDeuration($videoUrl);
+        $videoDuration=(new ViemoService())->getVideoDeuration($videoId);
 
         $lecture->update([
-            "video"=>$videoUrl,
+            "video"=>$videoId,
             "deuration"=>$videoDuration,
         ]);
 

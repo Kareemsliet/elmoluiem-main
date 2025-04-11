@@ -57,4 +57,11 @@ class Student extends Authenticatable implements MustVerifyEmail
     public function teacherRatingsAboutMe(){
         return $this->morphedByMany(Teacher::class,"rateable","student_rating")->withPivot("rate","description")->withTimestamps();
     }
+
+   public function orders(){
+     return $this->hasMany(Order::class,"student_id");
+   }
+    public function enrollingLessons(){
+        return $this->morphedByMany(Lesson::class,"enrollmentable","enrollmentables")->withTimestamps();
+    }
 }

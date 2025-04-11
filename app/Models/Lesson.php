@@ -20,4 +20,11 @@ class Lesson extends Model
         return $this->morphMany(Content::class,"contentable");
     }
 
+    public function enrollments(){
+        return $this->morphToMany(Student::class,"enrollmentable","enrollmentables")->withTimestamps();
+    }
+
+    public function orders(){
+        return $this->morphMany(Order::class,"orderable");
+    }
 }

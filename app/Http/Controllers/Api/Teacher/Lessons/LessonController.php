@@ -100,12 +100,15 @@ class LessonController extends Controller
 
         (new ImageService())->destroyImage($lesson->logo, "teachers/lessons");
 
+        if($lesson->enrollments->count() > 0){
+            return failResponse("you can't delete lesson, because it has enrollments");
+        }
+
         if ($lesson->contents->count() > 0) {
             $lesson->contents()->delete();
         }
 
         $lesson->delete();
-
 
         return successResponse("success delete lesson");
     }

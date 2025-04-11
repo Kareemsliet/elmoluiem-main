@@ -65,7 +65,7 @@ class MainController extends Controller
     {
         if ($request->user("sanctum")) {
 
-            $role="";
+            $role = "";
 
             if (auth("student")->check()) {
                 $role = "student";
@@ -95,7 +95,7 @@ class MainController extends Controller
     public function sendVerificationCode(Request $request)
     {
         $user = $request->user("sanctum");
-        
+
         (new VerficationService())->sendEmailVerificationCode($user);
 
         return successResponse("Success Send  verification Code at your email box");

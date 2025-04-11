@@ -19,7 +19,6 @@ class LessonReource extends JsonResource
             "title"=>$this->title,
             "logo"=>$this->logo?(new ImageService())->imageUrlToBase64("teachers/lessons/$this->logo"):"",
             "description"=>$this->description,
-            "teacher"=>new TeacherResource($this->teacher),
             "created_at"=>$this->created_at,
             "updated_at"=>$this->updated_at,
         ];

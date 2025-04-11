@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers\Api\Student;
 
+use App\Enums\PaymentStatusEnums;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Main\RatingRequest;
+use App\Http\Requests\Api\Student\PaymentInitiateRequest;
+use App\Http\Resources\LessonReource;
 use App\Http\Resources\RatingResource;
+use App\Http\Services\PaymobService;
+use App\Models\Lesson;
 use App\Models\Teacher;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MainController extends Controller
 {
@@ -38,20 +45,132 @@ class MainController extends Controller
     public function allGivenRatings()
     {
         $ratings = Teacher::all()->map(function ($item) {
-         return  $item->studentRatingsAboutMe()->where("students.id", '=', $this->student->id)->get();
+            return $item->studentRatingsAboutMe()->where("students.id", '=', $this->student->id)->get();
         })
-        ->flatten()
-        ->sortByDesc(function ($item) {
-            $item->pivot->created_at;
-        });
+            ->flatten()
+            ->sortByDesc(function ($item) {
+                $item->pivot->created_at;
+            });
 
-        return successResponse(data:RatingResource::collection($ratings));
+        return successResponse(data: RatingResource::collection($ratings));
     }
 
     public function allReceivedRatings()
     {
-       $ratings=$this->student->teacherRatingsAboutMe()->orderByPivot("created_at",'desc')->get();
+        $ratings = $this->student->teacherRatingsAboutMe()->orderByPivot("created_at", 'desc')->get();
 
-       return successResponse(data:RatingResource::collection($ratings));
+        return successResponse(data: RatingResource::collection($ratings));
     }
+
+    public function intiatePayment(PaymentInitiateRequest $request)
+    {
+        $request->validated();
+
+        $orderable = null;
+
+        $enrolled = false;
+
+        $data = [
+            "name" => $this->student->name,
+            "email" => $this->student->email,
+            "phone" => $this->student->phone,
+            "orderable_id" => $request->input("orderable_id"),
+            "orderable_type" => $request->input("orderable_type"),
+            "amount" => $request->input("amount"),
+            "student_id" => $this->student->id,
+        ];
+
+        if ($request->input("orderable_type") == "lessons") {
+            $orderable = Lesson::find($request->input("orderable_id"));
+
+            $enrolled = $this->student->enrollingLessons()
+                ->where("lessons.id", "=", $request->input("orderable_id"))
+                ->exists();
+        }
+
+        if ($request->input("orderable_type") == "courses") {
+            //
+        }
+
+        if ($enrolled) {
+            return failResponse("you are  enrolled in this course");
+        }
+
+        $paymentData = (new PaymobService())->generatePaymentData($data);
+
+        $orderable->orders()->create([
+            "student_id" => $this->student->id,
+            "amount" => $request->input("amount"),
+            "paymob_order_id" => $paymentData["orderId"],
+            "status" => PaymentStatusEnums::PENDING,
+        ]);
+
+        $paymentResource = (new PaymobService())->payWithPaymob($paymentData["paymentToken"], $request->input("wallet_number"));
+
+        return successResponse("please check your wallet", [
+            "redirect_url" => $paymentResource["redirect_url"],
+        ]);
+    }
+
+    public function callbackPayment(Request $request)
+    {
+        if (!$request->hmac) {
+            return failResponse("invalid request");
+        }
+
+        if (!$request->success) {
+            return failResponse("payment failed");
+        }
+
+        $order = $this->student->orders()->where([
+            ["paymob_order_id", "=", $request->order],
+            ["status", "=", PaymentStatusEnums::PENDING],
+        ])->first();
+
+        if (!$order) {
+            return failResponse("not found order or already paid");
+        }
+
+        $orderable = $order->orderable;
+
+        DB::transaction(function () use ($orderable, $order, $request) {
+            $order->update([
+                "status" => PaymentStatusEnums::SUCCESS,
+                "transaction_id" => $request->id,
+            ]);
+
+            if ($orderable->getTable() == "lessons") {
+                $this->student->enrollingLessons()->attach($orderable->id);
+            }
+
+            if ($orderable->getTable() == "courses") {
+                //
+            }
+
+            $total=$order->amount;
+
+            $commission = 0.10;
+
+            $teacher_amount = $total - ($total * $commission);
+
+            $platform_amount = $total * $commission;
+
+            $orderable->teacher->transactions()->create([
+                "total" => $total,
+                "commission" => $commission,
+                "teacher_amount" => $teacher_amount,
+                "commission_amount" => $platform_amount,
+            ]);
+        });
+
+        return successResponse("payment success and you are enrolled in this course");
+    }
+
+    public function enrollingLessons()
+    {
+        $enrollingLessons = $this->student->enrollingLessons()->orderByPivot("created_at", "desc")->get();
+
+        return successResponse(data: LessonReource::collection($enrollingLessons));
+    }
+
 }

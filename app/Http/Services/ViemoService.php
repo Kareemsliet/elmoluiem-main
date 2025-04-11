@@ -24,15 +24,19 @@ class ViemoService
             'description' => $description,
             'upload' => [
                 'approach' => 'tus',
-                'size' => filesize($filePath),                
+                'size' => filesize($filePath),
             ],
-        ],);
+        ]);
 
-        return $response;
+        $videoId = explode("/", $response)[2];
+
+        return $videoId;
     }
 
-    public function deleteVideo($videoUri)
+    public function deleteVideo($videoId)
     {
+        $videoUri = "/videos/$videoId";
+
         try {
             $response = $this->vimeo->request($videoUri, [], 'DELETE');
             return $response['status'] === 204;
@@ -41,27 +45,22 @@ class ViemoService
         }
     }
 
-    public function getVideoUrl($videoUri)
+    public function getVideoDeuration($videoId)
     {
-        $response = $this->vimeo->request($videoUri);
+        $videoUri = "/videos/$videoId";
 
-        if ($response['status'] == 200) {
-            return $response['body']['link'];
+        $duration = 0;
+
+        for ($i = 0; $i < 5; $i++) {
+
+            $response = $this->vimeo->request($videoUri);
+
+            if (in_array($response["body"]["status"], ['available', 'processing'])) {
+                $duration = $response["body"]["duration"];
+            }
+            
         }
 
-        return null;
-    }
-
-    public function getVideoDeuration($videoUri)
-    {
-        $response = $this->vimeo->request($videoUri . '?fields=duration,transcode.status');
-
-        $status = $response['body']['transcode']['status'];
-        
-        if ($status === 'complete') {
-            return $response['body']['duration'];
-        }
-
-        return null;
+        return $duration;
     }
 }
