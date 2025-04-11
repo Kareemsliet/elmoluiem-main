@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->double("total")->default(0.0);
-            $table->bigInteger("teacher_id")->unsigned();
+            $table->bigInteger("teacher_id")->unsigned()->nullable();
             $table->foreign("teacher_id")->references("id")->on("teachers")->onDelete("cascade")->onUpdate("cascade");
             $table->decimal("commission")->default(0.10);
             $table->decimal("teacher_amount")->default(0.0);

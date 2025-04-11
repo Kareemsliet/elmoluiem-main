@@ -1,15 +1,21 @@
 <?php
 
 namespace App\Http\Controllers\Api;
+use App\Http\Resources\CategoryResource;
+use App\Http\Resources\CourseResource;
 use App\Http\Resources\EducationSystemResource;
+use App\Http\Resources\SubCategoryResource;
 use App\Http\Resources\SubjectResource;
 use App\Http\Services\VerficationService;
+use App\Models\Category;
 use App\Models\Country;
 use App\Http\Controllers\Controller;
+use App\Models\Course;
 use App\Models\EducationLevel;
 use App\Models\EducationSystem;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\EducationLevelResource;
+use App\Models\SubCategory;
 use Illuminate\Http\Request;
 
 class MainController extends Controller
@@ -100,4 +106,50 @@ class MainController extends Controller
 
         return successResponse("Success Send  verification Code at your email box");
     }
+
+    public function categories()
+    {
+        $categories = Category::orderByDesc("created_at")->get();
+
+        return successResponse(data: CategoryResource::collection($categories));
+    }
+
+    public function subCategories($category_id)
+    {
+        $category = Category::find($category_id);
+
+        if (!is_numeric($category_id) || !$category) {
+            return failResponse("not found category");
+        }
+
+        $subCategories = $category->subCategories()->orderByDesc("created_at")->get();
+
+        return successResponse(data: SubCategoryResource::collection($subCategories));
+    }
+
+    public function courses(Request $request, $subCategory_id)
+    {
+
+        $search = $request->query("q", "");
+
+        $subCategory = SubCategory::find($subCategory_id);
+
+        if (!is_numeric($subCategory_id) || !$subCategory) {
+            return failResponse("not found sub category");
+        }
+
+        $courses = $subCategory->courses()->where("courses.name", 'like', "%$search%")->orderByDesc("created_at")->get();
+
+        return successResponse(data: CourseResource::collection($courses));
+    }
+
+    public function allCourses(Request $request)
+    {
+        $search = $request->query("q", "");
+
+        $courses = Course::where("name", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(10)->get();
+
+        return successResponse(data: CourseResource::collection($courses));
+    }
+
 }

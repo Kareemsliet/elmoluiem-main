@@ -6,11 +6,13 @@ use App\Enums\PaymentStatusEnums;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Main\RatingRequest;
 use App\Http\Requests\Api\Student\PaymentInitiateRequest;
+use App\Http\Resources\CourseResource;
 use App\Http\Resources\LessonReource;
 use App\Http\Resources\RatingResource;
 use App\Http\Services\PaymobService;
 use App\Models\Lesson;
 use App\Models\Teacher;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -89,7 +91,11 @@ class MainController extends Controller
         }
 
         if ($request->input("orderable_type") == "courses") {
-            //
+            $orderable = Lesson::find($request->input("orderable_id"));
+
+            $enrolled = $this->student->enrollingCourses()
+                ->where("courses.id", "=", $request->input("orderable_id"))
+                ->exists();
         }
 
         if ($enrolled) {
@@ -144,23 +150,34 @@ class MainController extends Controller
             }
 
             if ($orderable->getTable() == "courses") {
-                //
+                $this->student->enrollingCourses()->attach($orderable->id);
             }
 
-            $total=$order->amount;
+            $total = $order->amount;
 
-            $commission = 0.10;
+            if ($orderable->getTable() == "lessons") {
+                
+                $commission = 0.10;
 
-            $teacher_amount = $total - ($total * $commission);
+                $teacher_amount = $total - ($total * $commission);
 
-            $platform_amount = $total * $commission;
+                $platform_amount = $total * $commission;
 
-            $orderable->teacher->transactions()->create([
-                "total" => $total,
-                "commission" => $commission,
-                "teacher_amount" => $teacher_amount,
-                "commission_amount" => $platform_amount,
-            ]);
+                $orderable->teacher->transactions()->create([
+                    "total" => $total,
+                    "commission" => $commission,
+                    "teacher_amount" => $teacher_amount,
+                    "commission_amount" => $platform_amount,
+                ]);
+            }
+
+            if ($orderable->getTable() == "courses") {
+                Transaction::create([
+                    "total" => $total,
+                    "commission" => 0.0,
+                ]);
+            }
+            
         });
 
         return successResponse("payment success and you are enrolled in this course");
@@ -173,4 +190,10 @@ class MainController extends Controller
         return successResponse(data: LessonReource::collection($enrollingLessons));
     }
 
+    public function enrollingCourses()
+    {
+        $enrollingCourses = $this->student->enrollingCourses()->orderByPivot("created_at", "desc")->get();
+
+        return successResponse(data: CourseResource::collection($enrollingCourses));
+    }
 }

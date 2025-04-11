@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\Api\CoursesController;
 use App\Http\Controllers\Api\MainController;
 use App\Http\Controllers\Api\Student\AuthController as StudentAuthController;
 use App\Http\Controllers\Api\Teacher\AuthController as TeacherAuthController;
@@ -16,7 +17,16 @@ Route::group(["prefix" => "main"], function () {
     Route::get('{country_id}/education-systems', [MainController::class, 'educationsystems']);
     Route::get('{education_system_id}/education-levels', [MainController::class, 'educationlevels']);
     Route::get('{education_level_id}/subjects', [MainController::class, 'subjects']);
+    Route::get("/categories",[MainController::class,"categories"]);
+    Route::get("/{category_id}/sub-categories",[MainController::class,"subCategories"]);
+    Route::get("/{sub_category_id}/courses/",[MainController::class,"courses"]);
+    Route::get("/all-courses",[MainController::class,"allCourses"]);
+    Route::group(["prefix"=>"/courses/{course_id}/"],function(){
+        Route::get("/contents",[CoursesController::class,"contents"]);
+        Route::get("/{content_id}/lectures",[CoursesController::class,"lectures"]);
+    });
 });
+
 
 Route::post("/verification-email/send", [MainController::class, "sendVerificationCode"])->middleware(["auth:teacher,student,family", "throttleApi:1,1"]);
 Route::post("/check-auth", [MainController::class, "checkAuth"]);
@@ -46,6 +56,7 @@ Route::group(["prefix" => "student"], function () {
             });
             Route::group(["prefix" => "enrolling"], function () {
                 Route::get("/lessons", [StudentMainController::class, "enrollingLessons"]);
+                Route::get("/courses", [StudentMainController::class, "enrollingCourses"]);
             });
         });
     });
