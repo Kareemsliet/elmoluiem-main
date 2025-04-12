@@ -1,24 +1,25 @@
 <?php
 
-namespace App\Http\Controllers\Api\Teacher\Lessons;
+namespace App\Http\Controllers\Api\Teacher\Courses;
+
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Teacher\Lessons\LectureRequest;
 use App\Http\Resources\ContentLecturesReource;
 use App\Http\Services\ViemoService;
-use App\Models\Lesson;
+use App\Models\Course;
 use Illuminate\Http\Request;
 
-class LecturesController extends Controller
+class LectureController extends Controller
 {
-    public function index($lesson_id, $content_id)
+    public function index($course_id,$content_id)
     {
-        $lesson = Lesson::find($lesson_id);
+        $course= Course::find($course_id);
 
-        if (!is_numeric($lesson_id) || !$lesson) {
-            return failResponse("not found lesson");
+        if (!is_numeric($course_id) || !$course) {
+            return failResponse("not found course");
         }
 
-        $content = $lesson->contents()->find($content_id);
+        $content = $course->contents()->find($content_id);
 
         if (!is_numeric($content_id) || !$content) {
             return failResponse("not found content");
@@ -32,15 +33,15 @@ class LecturesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(LectureRequest $request, $lesson_id, $content_id)
+    public function store(LectureRequest $request,$course_id,$content_id)
     {
-        $lesson = Lesson::find($lesson_id);
+        $course= Course::find($course_id);
 
-        if (!is_numeric($lesson_id) || !$lesson) {
-            return failResponse("not found lesson");
+        if (!is_numeric($course_id) || !$course) {
+            return failResponse("not found course");
         }
 
-        $content = $lesson->contents()->find($content_id);
+        $content = $course->contents()->find($content_id);
 
         if (!is_numeric($content_id) || !$content) {
             return failResponse("not found content");
@@ -58,15 +59,15 @@ class LecturesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($lesson_id, $content_id, $id)
+    public function show($course_id,$content_id,$id)
     {
-        $lesson = Lesson::find($lesson_id);
+        $course= Course::find($course_id);
 
-        if (!is_numeric($lesson_id) || !$lesson) {
-            return failResponse("not found lesson");
+        if (!is_numeric($course_id) || !$course) {
+            return failResponse("not found course");
         }
 
-        $content = $lesson->contents()->find($content_id);
+        $content = $course->contents()->find($content_id);
 
         if (!is_numeric($content_id) || !$content) {
             return failResponse("not found content");
@@ -84,17 +85,17 @@ class LecturesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(LectureRequest $request, $lesson_id, $content_id, $id)
+    public function update(LectureRequest $request,$course_id,$content_id, $id)
     {
         $request->validated();
 
-        $lesson = Lesson::find($lesson_id);
+        $course= Course::find($course_id);
 
-        if (!is_numeric($lesson_id) || !$lesson) {
-            return failResponse("not found lesson");
+        if (!is_numeric($course_id) || !$course) {
+            return failResponse("not found course");
         }
 
-        $content = $lesson->contents()->find($content_id);
+        $content = $course->contents()->find($content_id);
 
         if (!is_numeric($content_id) || !$content) {
             return failResponse("not found content");
@@ -116,15 +117,15 @@ class LecturesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($lesson_id, $content_id, $id)
+    public function destroy($course_id,$content_id, $id)
     {
-        $lesson = Lesson::find($lesson_id);
+        $course= Course::find($course_id);
 
-        if (!is_numeric($lesson_id) || !$lesson) {
-            return failResponse("not found lesson");
+        if (!is_numeric($course_id) || !$course) {
+            return failResponse("not found course");
         }
 
-        $content = $lesson->contents()->find($content_id);
+        $content = $course->contents()->find($content_id);
 
         if (!is_numeric($content_id) || !$content) {
             return failResponse("not found content");
@@ -145,15 +146,15 @@ class LecturesController extends Controller
         return successResponse("success delete lecture");
     }
 
-    public function uploadVideo(Request $request, $lesson_id, $content_id, $id)
+    public function uploadVideo(Request $request,$course_id,$content_id, $id)
     {
-        $lesson = Lesson::find($lesson_id);
+        $course= Course::find($course_id);
 
-        if (!is_numeric($lesson_id) || !$lesson) {
-            return failResponse("not found lesson");
+        if (!is_numeric($course_id) || !$course) {
+            return failResponse("not found course");
         }
 
-        $content = $lesson->contents()->find($content_id);
+        $content = $course->contents()->find($content_id);
 
         if (!is_numeric($content_id) || !$content) {
             return failResponse("not found content");
@@ -175,19 +176,19 @@ class LecturesController extends Controller
 
         $validation->validated();
 
-        if ($lecture->video) {
+        if($lecture->video){
             (new ViemoService())->deleteVideo($lecture->video);
         }
 
         $videoPath = $request->file("video")->getRealPath();
 
-        $videoId = (new ViemoService())->uploadVideo($videoPath, $lecture->title, $lecture->description);
+        $videoId=(new ViemoService())->uploadVideo($videoPath,$lecture->title, $lecture->description);
 
-        $videoDuration = (new ViemoService())->getVideoDeuration($videoId);
+        $videoDuration=(new ViemoService())->getVideoDeuration($videoId);
 
         $lecture->update([
-            "video" => $videoId,
-            "deuration" => $videoDuration,
+            "video"=>$videoId,
+            "deuration"=>$videoDuration,
         ]);
 
         return successResponse("success upload video", new ContentLecturesReource($lecture));

@@ -10,17 +10,19 @@ class Course extends Model
     protected $table = 'courses';
 
     protected $fillable = [
-        'name',
+        'title',
         'description',
         'sub_category_id',
         'image',
         'price',
+        "teacher_id",
         'level',
     ];
 
-    protected function casts(){
+    protected function casts()
+    {
         return [
-            "level"=>CourseLevelsEnums::class,
+            "level" => CourseLevelsEnums::class,
         ];
     }
 
@@ -29,16 +31,22 @@ class Course extends Model
         return $this->belongsTo(SubCategory::class, 'sub_category_id');
     }
 
-    public function contents(){
+    public function contents()
+    {
         return $this->morphMany(Content::class, 'contentable');
     }
 
-    public function enrollments(){
+    public function enrollments()
+    {
         return $this->morphToMany(Student::class, 'enrollmentable', 'enrollmentables')->withTimestamps();
     }
 
-    public function orders(){
-        return $this->morphMany(Order::class,"orderable");
+    public function orders()
+    {
+        return $this->morphMany(Order::class, "orderable");
     }
-
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class, 'teacher_id');
+    }
 }

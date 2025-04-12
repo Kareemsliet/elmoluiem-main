@@ -10,6 +10,9 @@ use App\Http\Controllers\Api\Teacher\Lessons\LessonController;
 use App\Http\Controllers\Api\Student\MainController as StudentMainController;
 use App\Http\Controllers\Api\Teacher\MainController as TeacherMainController;
 use App\Http\Controllers\Api\Family\MainController as FamilyMainController;
+use App\Http\Controllers\Api\Teacher\Courses\CoursesController as TeacherCoursesController;
+use App\Http\Controllers\Api\Teacher\Courses\ContentsController as TeacherContentsCoursesController;
+use App\Http\Controllers\Api\Teacher\Courses\LectureController as TeacherLecturesCoursesController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(["prefix" => "main"], function () {
@@ -17,13 +20,13 @@ Route::group(["prefix" => "main"], function () {
     Route::get('{country_id}/education-systems', [MainController::class, 'educationsystems']);
     Route::get('{education_system_id}/education-levels', [MainController::class, 'educationlevels']);
     Route::get('{education_level_id}/subjects', [MainController::class, 'subjects']);
-    Route::get("/categories",[MainController::class,"categories"]);
-    Route::get("/{category_id}/sub-categories",[MainController::class,"subCategories"]);
-    Route::get("/{sub_category_id}/courses/",[MainController::class,"courses"]);
-    Route::get("/all-courses",[MainController::class,"allCourses"]);
-    Route::group(["prefix"=>"/courses/{course_id}/"],function(){
-        Route::get("/contents",[CoursesController::class,"contents"]);
-        Route::get("/{content_id}/lectures",[CoursesController::class,"lectures"]);
+    Route::get("/categories", [MainController::class, "categories"]);
+    Route::get("/{category_id}/sub-categories", [MainController::class, "subCategories"]);
+    Route::get("/{sub_category_id}/courses/", [MainController::class, "courses"]);
+    Route::get("/all-courses", [MainController::class, "allCourses"]);
+    Route::group(["prefix" => "/courses/{course_id}/"], function () {
+        Route::get("/contents", [CoursesController::class, "contents"]);
+        Route::get("/{content_id}/lectures", [CoursesController::class, "lectures"]);
     });
 });
 
@@ -99,23 +102,37 @@ Route::group(["prefix" => "teacher"], function () {
         Route::post("/verification-email/verify", [TeacherAuthController::class, "verifyCode"]);
         Route::post('/logout', [TeacherAuthController::class, 'logout']);
         Route::group(["middleware" => "hasVerified"], function () {
+            
             Route::post('/update-password', [TeacherAuthController::class, 'updatePassword']);
             Route::get('/me', [TeacherAuthController::class, "profile"]);
             Route::post("/me", [TeacherAuthController::class, "updateProfile"]);
-            Route::apiResource("/lessons", LessonController::class);
-            Route::apiResource("/{lesson_id}/contents", ContentsController::class);
-            Route::apiResource("/{content_id}/lectures", LecturesController::class);
-            Route::post("/{content_id}/lectures/{id}/video-upload", [LecturesController::class, "uploadVideo"]);
+            
             Route::group(["prefix" => "ratings"], function () {
                 Route::post("/{student_id}/rate", [TeacherMainController::class, "rateStudent"]);
                 Route::get("/given-all", [TeacherMainController::class, "allGivenRatings"]);
                 Route::get("/received-all", [TeacherMainController::class, "allReceivedRatings"]);
             });
-            Route::group(["prefix"=>"wallet"],function(){
+            
+            Route::group(["prefix" => "wallet"], function () {
                 Route::get("/", [TeacherMainController::class, "myWallet"]);
-                Route::get("/payouts",[TeacherMainController::class,"payouts"]);
-                Route::post("/payout",[TeacherMainController::class,"createPayout"]);
+                Route::get("/payouts", [TeacherMainController::class, "payouts"]);
+                Route::post("/payout", [TeacherMainController::class, "createPayout"]);
             });
+
+            Route::group(["prefix" => "lessons", "as" => "lessons."], function () {
+                Route::apiResource("/", LessonController::class)->parameters([""=>"lesson_id"]);
+                Route::apiResource("/{lesson_id}/contents", ContentsController::class);
+                Route::apiResource("{lesson_id}/contents/{content_id}/lectures", LecturesController::class);
+                Route::post("/{lesson_id}/contents/{content_id}/lectures/{id}/video-upload", [LecturesController::class, "uploadVideo"]);
+            });
+
+            Route::group(["prefix" => "courses", "as" => "courses."], function () {
+                Route::apiResource("/", TeacherCoursesController::class)->parameter("","course_id");
+                Route::apiResource("/{course_id}/contents", TeacherContentsCoursesController::class);
+                Route::apiResource("/{course_id}/contents/{content_id}/lectures", TeacherLecturesCoursesController::class);
+                Route::post("/{course_id}/contents/{content_id}/lectures/{id}/video-upload", [TeacherLecturesCoursesController::class, "uploadVideo"]);
+            });
+
         });
     });
 });

@@ -79,4 +79,9 @@ class Teacher extends Authenticatable implements MustVerifyEmail
     public function payouts(){
         return $this->hasMany(Payout::class,"teacher_id");
     }
+
+    public function courses(){
+        return $this->hasMany(Course::class,"teacher_id");
+    }
+
 }

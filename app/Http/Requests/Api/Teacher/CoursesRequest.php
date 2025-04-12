@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Api\Teacher\Lessons;
+namespace App\Http\Requests\Api\Teacher;
 
+use App\Enums\CourseLevelsEnums;
 use App\Rules\UniqueColumnById;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LessonRequest extends FormRequest
+class CoursesRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,19 +23,27 @@ class LessonRequest extends FormRequest
      */
     public function rules(): array
     {
-        $lesson=$this->route("lesson_id",0);
+        $course=$this->route("course_id",0);
         
+        $courseLevels=array_map(function($level){
+            return $level->value;
+        },CourseLevelsEnums::cases());
+
+        $courseLevels=implode(",",$courseLevels);
+
         return [
             "price"=>"required|numeric",
-            "logo"=>$this->when(function(){
+            "image"=>$this->when(function(){
                 return $this->getMethod()=="POST";
             },function(){
                 return "required|image|max:15000|mimes:png,jpg,svg";
             },function(){
                 return "nullable|image|max:15000|mimes:png,jpg,svg";
             }),
-            "title"=>["required","string","max:100",new UniqueColumnById("lessons",'title','teachers','teacher_id',$lesson)],
+            "title"=>["required","string","max:100",new UniqueColumnById("courses",'title','teachers','teacher_id',$course)],
             "description"=>"required|string|max:250",
+            "sub_category_id"=>"required|exists:sub_categories,id",
+            "level"=>"required|string|lowercase|in:$courseLevels",
         ];
     }
 

@@ -49,18 +49,12 @@ class ViemoService
     {
         $videoUri = "/videos/$videoId";
 
-        $duration = 0;
+        $response = $this->vimeo->request($videoUri);
 
-        for ($i = 0; $i < 5; $i++) {
-
-            $response = $this->vimeo->request($videoUri);
-
-            if (in_array($response["body"]["status"], ['available', 'processing'])) {
-                $duration = $response["body"]["duration"];
-            }
-            
+        if ($response['status'] === 200) {
+            return $response['body']["duration"];
         }
 
-        return $duration;
+        return null;
     }
 }

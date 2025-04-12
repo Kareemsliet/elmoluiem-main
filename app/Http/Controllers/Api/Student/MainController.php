@@ -122,7 +122,7 @@ class MainController extends Controller
 
     public function callbackPayment(Request $request)
     {
-        if (!$request->hmac) {
+        if (!$request->hmac || !$request->id || !$request->order) {
             return failResponse("invalid request");
         }
 
@@ -142,6 +142,7 @@ class MainController extends Controller
         $orderable = $order->orderable;
 
         DB::transaction(function () use ($orderable, $order, $request) {
+
             $order->update([
                 "status" => PaymentStatusEnums::SUCCESS,
                 "transaction_id" => $request->id,
@@ -157,29 +158,19 @@ class MainController extends Controller
 
             $total = $order->amount;
 
-            if ($orderable->getTable() == "lessons") {
+            $commission = 0.10;
 
-                $commission = 0.10;
+            $teacher_amount = $total - ($total * $commission);
 
-                $teacher_amount = $total - ($total * $commission);
+            $platform_amount = $total * $commission;
 
-                $platform_amount = $total * $commission;
-
-                $orderable->teacher->transactions()->create([
-                    "total" => $total,
-                    "commission" => $commission,
-                    "teacher_amount" => $teacher_amount,
-                    "commission_amount" => $platform_amount,
-                ]);
-            }
-
-            if ($orderable->getTable() == "courses") {
-                Transaction::create([
-                    "total" => $total,
-                    "commission" => 0.0,
-                ]);
-            }
-
+            $orderable->teacher->transactions()->create([
+                "total" => $total,
+                "commission" => $commission,
+                "teacher_amount" => $teacher_amount,
+                "commission_amount" => $platform_amount,
+            ]);
+        
         });
 
         return successResponse("payment success and you are enrolled in this course");

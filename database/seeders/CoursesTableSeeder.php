@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Enums\CourseLevelsEnums;
 use App\Models\Course;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class CoursesTableSeeder extends Seeder
@@ -15,9 +14,10 @@ class CoursesTableSeeder extends Seeder
     public function run(): void
     {
         $frontEndCourse=Course::create([
-            'name' => 'Frontend Development',
+            'title' => 'Frontend Development',
             'description' => 'HTML, CSS, JavaScript and frontend frameworks',
             'sub_category_id' => 1,
+            "teacher_id"=>1,
             "level"=>CourseLevelsEnums::BEGINNER,
         ]);
 
@@ -66,9 +66,10 @@ class CoursesTableSeeder extends Seeder
         });
 
         $backEndCourse=Course::create([
-            'name' => 'Backend Development',
+            'title' => 'Backend Development',
             'description' => 'Server-side programming and database integration',
             'sub_category_id' => 2,
+            "teacher_id"=>1,
             "level"=>CourseLevelsEnums::ADVANCED,
         ]);
 
@@ -117,9 +118,10 @@ class CoursesTableSeeder extends Seeder
         });
 
         $mobileDevelopmentCourse=Course::create([
-            'name' => 'Mobile Development',
+            'title' => 'Mobile Development',
             'description' => 'Building apps for Android and iOS devices',
             'sub_category_id' => 3,
+            "teacher_id"=>1,
             "level"=>CourseLevelsEnums::INTERMEDIATE,
         ]);
 
@@ -168,9 +170,10 @@ class CoursesTableSeeder extends Seeder
         });
 
         $dataScienceCourse=Course::create([
-            'name' => 'Data Science',
+            'title' => 'Data Science',
             'description' => 'Explore data analysis, machine learning, and artificial intelligence techniques.',
             'sub_category_id' => 4,
+            "teacher_id"=>1,
             "level"=>CourseLevelsEnums::EXPERT,
         ]);
 

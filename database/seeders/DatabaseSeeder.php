@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             EducationSystemTableSeeder::class,
             EducationSystemLevelsTableSeeder::class,
             SubjectTableSeeder::class,
+            TeachersTableSeeder::class,
             CategoriesTableSeeder::class,
             SubCategoriesTableSeeder::class,
             CoursesTableSeeder::class,
