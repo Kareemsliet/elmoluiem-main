@@ -13,7 +13,9 @@
         "laravel/framework": "^11.41",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
+        "musonza/chat": "^6.3",
         "pion/laravel-chunk-upload": "^1.5",
+        "pusher/pusher-php-server": "^7.2",
         "vimeo/laravel": "^5.10",
         "vimeo/vimeo-api": "^3.0"
     },

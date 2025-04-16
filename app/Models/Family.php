@@ -6,10 +6,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Musonza\Chat\Models\Conversation;
+use Musonza\Chat\Traits\Messageable;
 
 class Family extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable,Messageable;
     protected $table = 'familes';
     public $timestamps = true;
     protected $fillable = [
@@ -48,5 +50,8 @@ class Family extends Authenticatable implements MustVerifyEmail
 
     public function teacherRatings(){
         return $this->morphToMany(Teacher::class,"rateable","teacher_ratings")->withPivot("rate","description")->withTimestamps();  
+    }
+    public function hiddenConversations(){
+        return $this->morphToMany(Conversation::class,"messageable","hidden_conversation")->withTimestamps();
     }
 }

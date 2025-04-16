@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Family\MainController as FamilyMainController;
 use App\Http\Controllers\Api\Teacher\Courses\CoursesController as TeacherCoursesController;
 use App\Http\Controllers\Api\Teacher\Courses\ContentsController as TeacherContentsCoursesController;
 use App\Http\Controllers\Api\Teacher\Courses\LectureController as TeacherLecturesCoursesController;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 Route::group(["prefix" => "main"], function () {
@@ -30,9 +31,10 @@ Route::group(["prefix" => "main"], function () {
     });
 });
 
-
 Route::post("/verification-email/send", [MainController::class, "sendVerificationCode"])->middleware(["auth:teacher,student,family", "throttleApi:1,1"]);
 Route::post("/check-auth", [MainController::class, "checkAuth"]);
+
+Broadcast::routes(["middleware"=>"auth:sanctum"]);
 
 Route::group(["prefix" => "student"], function () {
 
@@ -136,3 +138,5 @@ Route::group(["prefix" => "teacher"], function () {
         });
     });
 });
+
+require_once __DIR__ . '/chat.php';

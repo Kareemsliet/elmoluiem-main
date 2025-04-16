@@ -4,15 +4,16 @@ namespace App\Models;
 use App\Enums\CourseTypesEnums;
 use App\Enums\GenderTypesEnums;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Musonza\Chat\Models\Conversation;
+use Musonza\Chat\Traits\Messageable;
 
 class Teacher extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable,Messageable;
     protected $table = 'teachers';
     public $timestamps = true;
     protected $fillable = [
@@ -82,6 +83,10 @@ class Teacher extends Authenticatable implements MustVerifyEmail
 
     public function courses(){
         return $this->hasMany(Course::class,"teacher_id");
+    }
+
+    public function hiddenConversations(){
+        return $this->morphToMany(Conversation::class,"messageable","hidden_conversation")->withTimestamps();
     }
 
 }
