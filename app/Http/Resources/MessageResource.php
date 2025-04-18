@@ -33,8 +33,6 @@ class MessageResource extends JsonResource
 
                 $side = "left";
 
-                $participation = $user->participation()->first();
-
                 $anotherParticipation = $conversation->participants->except($user->participation()->first()->id)->first();
 
                 $message = MessageNotification::where([
@@ -53,7 +51,13 @@ class MessageResource extends JsonResource
 
             } else {
                 $side = "right";
-                $participation = $conversation->participants->except($user->participation()->first()->id)->first();
+                if(isset($this->is_after)){
+                    if($this->is_after){
+                        $participation = $conversation->participants->except($user->participation()->first()->id)->first();
+                    }
+                }else{
+                    $participation = $conversation->participants->except($user->participation()->first()->id)->first();                    
+                }
             }
         }
 
@@ -80,7 +84,7 @@ class MessageResource extends JsonResource
             "created_at" => $this->created_at,
             "deleted_at" => $this->deleted_at,
             "read" => $read,
-            "sender" => new ParticipationResource($participation),
+            "sender" => $participation ? new ParticipationResource($participation) : null,
         ];
     }
 }

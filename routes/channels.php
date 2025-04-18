@@ -1,5 +1,6 @@
 <?php
 
+use App\Broadcasting\MessageWasSent;
 use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
@@ -7,3 +8,5 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 },
     ['guards' => ['sanctum']]
 );
+
+Broadcast::channel("chat-conversation.{conversation_id}",MessageWasSent::class,["guard"=>"sanctum"]);

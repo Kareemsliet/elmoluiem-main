@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ConversationListResource;
@@ -55,7 +54,7 @@ class ChatController extends Controller
         if (!$conversation) {
             return failResponse("not found conversation");
         }
-        
+
         DB::transaction(function () use ($conversation) {
             Chat::conversation($conversation)->setParticipant($this->user)->readAll();
         });
@@ -65,12 +64,6 @@ class ChatController extends Controller
 
     public function deleteMessage(Request $request, $conversation_id, $message_id)
     {
-        $type = $request->query("type", 0);
-
-        if (!in_array($type, [0, 1])) {
-            return failResponse("type must be 0 or 1");
-        }
-
         $conversation = Chat::conversations()->setParticipant($this->user)->getById($conversation_id);
 
         if (!$conversation) {
@@ -86,13 +79,29 @@ class ChatController extends Controller
             return failResponse("not found message");
         }
 
+        $validation = validator($request->only("type"), [
+            "type" => $request->when(function () use ($message) {
+                return $message->is_sender == 1 ? true : false;
+            }, function () {
+                return "string|required|in:0,1";
+            }, function () {
+                return "string|required|in:0";
+            })
+        ]);
+
+        if ($validation->fails()) {
+            return failResponse($validation->errors()->first());
+        }
+
+        $validation->validated();
+
         $messageNotification = MessageNotification::where("id", '=', $message->id)->first();
 
-        if (isset($message->data["image"]) && $type == 1) {
+        if (isset($message->data["image"]) && $request->input("type") == 1) {
             (new ImageService())->destroyImage($message->data["image"]["name"], "chat");
         }
 
-        if ($type == 1) {
+        if ($request->input("type")  == 1) {
             $messageNotification->message->messageNotifications->map(function ($item) {
                 if ($item) {
                     Chat::message($item->message)->setParticipant($item->messageable)->delete();
@@ -226,8 +235,8 @@ class ChatController extends Controller
             $this->user->hiddenConversations()->detach($conversation->id);
         }
 
-        $participantHiddenConversation=$participation->hiddenConversations()
-        ->where("chat_conversations.id", '=', $conversation->id)->first();
+        $participantHiddenConversation = $participation->hiddenConversations()
+            ->where("chat_conversations.id", '=', $conversation->id)->first();
 
         if ($participantHiddenConversation) {
             $participation->hiddenConversations()->detach($conversation->id);
