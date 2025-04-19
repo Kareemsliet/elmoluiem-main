@@ -15,4 +15,5 @@ Route::group(["prefix"=>"/chat/a/","middleware"=>["auth:sanctum","hasVerified"]]
     Route::post("/{conversation_id}/messages/create",[ChatController::class,"createMessage"]);
     Route::post("/conversations/{user_id}/new",[ChatController::class,"createConversation"]);
     Route::post("/conversations/{user_id}/hide",[ChatController::class,"hideConversation"]);
+    Route::post("/{conversation_id}/messages/write",[ChatController::class,"writeMessage"]);
 });

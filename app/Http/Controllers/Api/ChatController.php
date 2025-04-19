@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers\Api;
+use App\Events\ConversationEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ConversationListResource;
 use App\Http\Resources\ConversationResource;
@@ -59,6 +60,8 @@ class ChatController extends Controller
             Chat::conversation($conversation)->setParticipant($this->user)->readAll();
         });
 
+        broadcast(new ConversationEvent($conversation))->toOthers();
+
         return successResponse(data: new ConversationResource($conversation));
     }
 
@@ -107,6 +110,7 @@ class ChatController extends Controller
                     Chat::message($item->message)->setParticipant($item->messageable)->delete();
                 }
             });
+            broadcast(new ConversationEvent($conversation))->toOthers();
         } else {
             DB::transaction(function () use ($messageNotification) {
                 Chat::message($messageNotification->message)->setParticipant($this->user)->delete();
@@ -305,5 +309,16 @@ class ChatController extends Controller
         $this->user->hiddenConversations()->attach($conversation->id);
 
         return successResponse("success hide conversation");
+    }
+
+    public function writeMessage($conversation_id){
+        
+        $conversation = Chat::conversations()->setParticipant($this->user)->getById($conversation_id);
+
+        if (!$conversation) {
+            return failResponse("not found conversation");
+        }
+
+        broadcast(new ConversationEvent($conversation))->toOthers();
     }
 }
