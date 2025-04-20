@@ -320,5 +320,7 @@ class ChatController extends Controller
         }
 
         broadcast(new ConversationEvent($conversation))->toOthers();
+
+        return successResponse();
     }
 }
