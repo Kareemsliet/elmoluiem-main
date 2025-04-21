@@ -125,14 +125,14 @@ Route::group(["prefix" => "teacher"], function () {
                 Route::apiResource("/", LessonController::class)->parameters([""=>"lesson_id"]);
                 Route::apiResource("/{lesson_id}/contents", ContentsController::class);
                 Route::apiResource("{lesson_id}/contents/{content_id}/lectures", LecturesController::class);
-                Route::post("/{lesson_id}/contents/{content_id}/lectures/{id}/video-upload", [LecturesController::class, "uploadVideo"]);
+                Route::post("/{lesson_id}/contents/{content_id}/lectures/{id}/video-upload", [LecturesController::class, "uploadVideo"])->middleware("throttleApi:2,1");
             });
 
             Route::group(["prefix" => "courses", "as" => "courses."], function () {
                 Route::apiResource("/", TeacherCoursesController::class)->parameter("","course_id");
                 Route::apiResource("/{course_id}/contents", TeacherContentsCoursesController::class);
                 Route::apiResource("/{course_id}/contents/{content_id}/lectures", TeacherLecturesCoursesController::class);
-                Route::post("/{course_id}/contents/{content_id}/lectures/{id}/video-upload", [TeacherLecturesCoursesController::class, "uploadVideo"]);
+                Route::post("/{course_id}/contents/{content_id}/lectures/{id}/video-upload", [TeacherLecturesCoursesController::class, "uploadVideo"])->middleware("throttleApi:2,1");
             });
 
         });

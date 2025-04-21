@@ -45,22 +45,22 @@ class CoursesTableSeeder extends Seeder
                 [
                     'title' => 'HTML Introduction',
                     'description' => 'Understanding the basics of HTML.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'CSS Selectors',
                     'description' => 'Learn about different CSS selectors.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'JavaScript Variables',
                     'description' => 'Understanding variables in JavaScript.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'React Components',
                     'description' => 'Learn about components in React.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
             ]);
         });
@@ -97,22 +97,22 @@ class CoursesTableSeeder extends Seeder
                 [
                     'title' => 'Node.js Basics',
                     'description' => 'Understanding the basics of Node.js.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'Express.js Framework',
                     'description' => 'Learn about the Express.js framework.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'Database Management',
                     'description' => 'Understanding database management systems.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'API Security',
                     'description' => 'Learn about securing APIs.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
             ]);
         });
@@ -149,22 +149,22 @@ class CoursesTableSeeder extends Seeder
                 [
                     'title' => 'Android Studio Setup',
                     'description' => 'Setting up Android Studio for development.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'Swift Basics',
                     'description' => 'Understanding the basics of Swift programming.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'React Native Overview',
                     'description' => 'Learn about React Native for cross-platform development.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'Mobile App Testing',
                     'description' => 'Learn about testing mobile applications.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
             ]);
         });
@@ -201,22 +201,22 @@ class CoursesTableSeeder extends Seeder
                 [
                     'title' => 'Python for Data Science',
                     'description' => 'Learn Python programming for data science.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'Machine Learning Algorithms',
                     'description' => 'Understanding various machine learning algorithms.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'Data Visualization Tools',
                     'description' => 'Learn about tools for data visualization.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
                 [
                     'title' => 'AI Applications',
                     'description' => 'Explore applications of artificial intelligence.',
-                    "video"=>"1074495296",
+                    "video"=>"1077340382",
                 ],
             ]);
         });

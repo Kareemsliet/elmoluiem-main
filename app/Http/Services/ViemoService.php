@@ -28,6 +28,8 @@ class ViemoService
             ],
         ]);
 
+        $this->updateVideoOptions($response);
+
         $videoId = explode("/", $response)[2];
 
         return $videoId;
@@ -52,9 +54,66 @@ class ViemoService
         $response = $this->vimeo->request($videoUri);
 
         if ($response['status'] === 200) {
-            return $response['body']["duration"];
+            return $response["body"]["duration"];
         }
 
         return null;
     }
+
+    public function getVideoUrl($videoId)
+    {
+        $videoUri = "/videos/$videoId";
+
+        $response = $this->vimeo->request($videoUri);
+
+        if ($response['status'] === 200) {
+            return $response['body']["link"];
+        }
+
+        return null;
+    }
+
+    public function updateVideoOptions($videoUri)
+    {
+        $response = $this->vimeo->request("$videoUri", [
+            'embed' => [
+                'buttons' => [
+                    'like' => false,
+                    'share' => false,
+                    'watchlater' => false,
+                    'embed' => false,
+                    "add" => false,
+                ],
+                'logos' => [
+                    'vimeo' => false,
+                    'custom' => [
+                        'active' => false,
+                        'link' => 'https://elmullim.com',
+                        'sticky' => true
+                    ]
+                ],
+                'title' => [
+                    'name' => 'hide',
+                    'owner' => 'hide',
+                    'portrait' => 'hide'
+                ],
+                'domains' =>['localhost:5173', 'elmullim.com'],
+            ],
+            'playback' => [
+                'quality' => [
+                    'type' => 'hls',
+                    'custom' => [
+                        'bitrates' => [240, 360, 540, 720, 1080]
+                    ]
+                ],
+                'resolution' => '1080p'
+            ],
+            'privacy' => [
+                'view' => 'unlisted',
+                "dawnload" => false,
+                'embed' => 'public',
+            ],
+        ], "PATCH");
+    }
+
 }
