@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\Api\CoursesController;
 use App\Http\Controllers\Api\MainController;
 use App\Http\Controllers\Api\Student\AuthController as StudentAuthController;
