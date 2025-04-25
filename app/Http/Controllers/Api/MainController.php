@@ -138,7 +138,7 @@ class MainController extends Controller
             return failResponse("not found sub category");
         }
 
-        $courses = $subCategory->courses()->where("courses.name", 'like', "%$search%")->orderByDesc("created_at")->get();
+        $courses = $subCategory->courses()->where("courses.title", 'like', "%$search%")->orderByDesc("created_at")->get();
 
         return successResponse(data: CourseResource::collection($courses));
     }
@@ -147,7 +147,7 @@ class MainController extends Controller
     {
         $search = $request->query("q", "");
 
-        $courses = Course::where("name", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(10)->get();
+        $courses = Course::where("title", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(10)->get();
 
         return successResponse(data: CourseResource::collection($courses));
     }

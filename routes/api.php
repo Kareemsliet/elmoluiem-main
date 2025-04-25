@@ -28,7 +28,7 @@ Route::group(["prefix" => "main"], function () {
     Route::get("/all-courses", [MainController::class, "allCourses"]);
     Route::group(["prefix" => "/courses/{course_id}/"], function () {
         Route::get("/contents", [CoursesController::class, "contents"]);
-        Route::get("/{content_id}/lectures", [CoursesController::class, "lectures"]);
+        Route::get("/{content_id}/lectures", [CoursesController::class, "lectures"])->middleware("auth:sanctum");
     });
 });
 

@@ -310,17 +310,4 @@ class ChatController extends Controller
 
         return successResponse("success hide conversation");
     }
-
-    public function writeMessage($conversation_id){
-        
-        $conversation = Chat::conversations()->setParticipant($this->user)->getById($conversation_id);
-
-        if (!$conversation) {
-            return failResponse("not found conversation");
-        }
-
-        broadcast(new ConversationEvent($conversation))->toOthers();
-
-        return successResponse();
-    }
 }
