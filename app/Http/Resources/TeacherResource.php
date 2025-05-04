@@ -30,6 +30,9 @@ class TeacherResource extends JsonResource
             'course_types'   => $this->course_type,
             "gender"=>$this->gender->value,
             "subjects"=> SubjectResource::collection($this->subjects),
+            "courses_count" => $this->courses->count(),
+            "lessons_count" => $this->lessons->count(),
+            "rating" => (float) collect([$this->studentRatingsAboutMe,$this->familyRatingsAboutMe])->flatten()->avg(fn($item) => $item->pivot->rate)
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Resources\CourseResource;
 use App\Http\Resources\EducationSystemResource;
 use App\Http\Resources\SubCategoryResource;
 use App\Http\Resources\SubjectResource;
+use App\Http\Resources\TeacherResource;
 use App\Http\Services\VerficationService;
 use App\Models\Category;
 use App\Models\Country;
@@ -16,6 +17,7 @@ use App\Models\EducationSystem;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\EducationLevelResource;
 use App\Models\SubCategory;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 
 class MainController extends Controller
@@ -129,7 +131,6 @@ class MainController extends Controller
 
     public function courses(Request $request, $subCategory_id)
     {
-
         $search = $request->query("q", "");
 
         $subCategory = SubCategory::find($subCategory_id);
@@ -138,18 +139,20 @@ class MainController extends Controller
             return failResponse("not found sub category");
         }
 
-        $courses = $subCategory->courses()->where("courses.title", 'like', "%$search%")->orderByDesc("created_at")->get();
+        $courses = $subCategory->courses()->where("courses.title", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(10)->get();
 
         return successResponse(data: CourseResource::collection($courses));
     }
 
-    public function allCourses(Request $request)
-    {
-        $search = $request->query("q", "");
+    public function teacherDetails($teacher_id){
+        
+        $teacher =Teacher::find($teacher_id);
 
-        $courses = Course::where("title", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(10)->get();
-
-        return successResponse(data: CourseResource::collection($courses));
+        if (!is_numeric($teacher_id) || !$teacher) {
+            return failResponse("not found teacher");
+        }
+        
+        return successResponse(data:new TeacherResource($teacher));
     }
 
 }

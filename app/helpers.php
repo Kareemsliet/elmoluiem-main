@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Course;
+
 function failResponse($message =null, $data = null)
 {
     $response = [
@@ -26,3 +28,12 @@ function unAuthorize($message="un authorize"){
     ];
     return response()->json($response,403);
 }
+
+function hasEnrolledCourse($user,$courseId){
+    return $user->enrollingCourses()->where("courses.id",'=',$courseId)->exists();
+}
+
+function hasEnrolledLesson($user,$lessonId){
+    return $user->enrollingLessons()->where("lessons.id",'=',$lessonId)->exists();
+}
+

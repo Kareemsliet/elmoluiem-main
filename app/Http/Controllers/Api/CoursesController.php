@@ -4,10 +4,20 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ContentLecturesReource;
 use App\Http\Resources\ContentReource;
+use App\Http\Resources\CourseResource;
 use App\Models\Course;
+use Illuminate\Http\Request;
 
 class CoursesController extends Controller
 {
+    public function allCourses(Request $request)
+    {
+        $search = $request->query("q", "");
+
+        $courses = Course::where("title", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(10)->get();
+
+        return successResponse(data:CourseResource::collection($courses));
+    }
     public function contents($course_id)
     {
         $course = Course::find($course_id);
