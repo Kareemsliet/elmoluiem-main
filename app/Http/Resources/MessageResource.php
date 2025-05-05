@@ -44,9 +44,7 @@ class MessageResource extends JsonResource
 
                 if ($message) {
                     $isSeen = $message->is_seen == 1 ? true : false;
-                    $read = [
-                        "status" => $isSeen,
-                    ];
+                    $read = $isSeen;
                 }
 
             } else {

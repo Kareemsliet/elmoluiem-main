@@ -275,11 +275,11 @@ class ChatController extends Controller
             $participation = $item->conversation->participants->except($this->user->participation()->first()->id)->first();
             return $participation->messageable;
         })
-            ->filter(function ($item) use ($newFriend, $role) {
+        ->filter(function ($item) use ($newFriend, $role) {
                 return $item->id == $newFriend->id && $item->getTable() === $role;
-            })
-            ->flatten()
-            ->first();
+        })
+        ->flatten()
+        ->first();
 
         if ($existingConversation) {
             return failResponse("conversation already exists");
