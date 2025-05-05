@@ -5,6 +5,8 @@ namespace App\Http\Resources;
 use App\Http\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Musonza\Chat\Facades\ChatFacade as Chat;
+
 
 class StudentResource extends JsonResource
 {
@@ -18,11 +20,40 @@ class StudentResource extends JsonResource
     {
         $favourite_subjects=$this->subjects()->orderByPivot("created_at","desc")->get();
 
+        $user=auth("sanctum")->user();
+
+        $conversation=null;
+
+        if($user){
+            if(!($user->id==$this->id && $user->getTable()=="students")){
+                
+                $existingParticipation = Chat::conversations()->setParticipant($this->getModel())->get()->map(function ($item) {
+                    $participation = $item->conversation->participants->except($this->participation()->first()->id)->first();
+                    return $participation->messageable;
+                })
+                ->filter(function ($item) use ($user) {
+                    return $item->id == $user->id && $item->getTable() === $user->getTable();
+                })
+                ->flatten()
+                ->first();
+
+                if($existingParticipation){
+                    $conversation=Chat::conversations()->setParticipant($existingParticipation)->get()->map(function ($item) {
+                        $particiption = $item->conversation->participants()->where("messageable_type",'=',get_class($this->getModel()))
+                        ->where("messageable_id",'=',$this->id)
+                        ->first();
+                        return $particiption->conversation_id;
+                    })->flatten()->first();
+                }
+            }
+        }
+
         return [
             'name'          => $this->name,
             'phone'         => $this->phone,
             'address'       => $this->address,
             "email"         => $this->email,
+            "conversation"  => $conversation,
             "gender"=>$this->gender->value,
             "profile_image"=>$this->profile_image?(new ImageService())->imageUrlToBase64("students/$this->profile_image"):"",
             "description"   =>$this->description,
