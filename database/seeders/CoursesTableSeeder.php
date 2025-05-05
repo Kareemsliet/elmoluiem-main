@@ -13,7 +13,7 @@ class CoursesTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $frontEndCourse=Course::create([
+        $frontEndCourse1=Course::create([
             'title' => 'Frontend Development',
             'description' => 'HTML, CSS, JavaScript and frontend frameworks',
             'sub_category_id' => 1,
@@ -21,7 +21,7 @@ class CoursesTableSeeder extends Seeder
             "level"=>CourseLevelsEnums::BEGINNER,
         ]);
 
-        $contents=$frontEndCourse->contents()->createMany([
+        $contents=$frontEndCourse1->contents()->createMany([
             [
                 'title' => 'HTML Basics',
                 'description' => 'Learn the structure of web pages using HTML.',
@@ -36,6 +36,102 @@ class CoursesTableSeeder extends Seeder
             ],
             [
                 'title' => 'Frontend Frameworks',
+                'description' => 'Explore popular frontend frameworks like React and Vue.',
+            ],
+        ]);
+
+        $contents->map(function($conten){
+            $conten->lectures()->createMany([
+                [
+                    'title' => 'HTML Introduction',
+                    'description' => 'Understanding the basics of HTML.',
+                    "video"=>"1077340382",
+                ],
+                [
+                    'title' => 'CSS Selectors',
+                    'description' => 'Learn about different CSS selectors.',
+                    "video"=>"1077340382",
+                ],
+                [
+                    'title' => 'JavaScript Variables',
+                    'description' => 'Understanding variables in JavaScript.',
+                    "video"=>"1077340382",
+                ],
+                [
+                    'title' => 'React Components',
+                    'description' => 'Learn about components in React.',
+                    "video"=>"1077340382",
+                ],
+            ]);
+        });
+
+        $frontEndCourse2=Course::create([
+            'title' => 'React.js',
+            'description' => 'frontend framework',
+            'sub_category_id' => 1,
+            "teacher_id"=>1,
+            "level"=>CourseLevelsEnums::BEGINNER,
+        ]);
+
+        $contents=$frontEndCourse2->contents()->createMany([
+            [
+                'title' => 'JavaScript Essentials',
+                'description' => 'Make your web pages interactive with JavaScript.',
+            ],
+            [
+                'title' => 'React Framework',
+                'description' => 'Explore popular frontend frameworks like React and Vue.',
+            ],
+        ]);
+
+        $contents->map(function($conten){
+            $conten->lectures()->createMany([
+                [
+                    'title' => 'HTML Introduction',
+                    'description' => 'Understanding the basics of HTML.',
+                    "video"=>"1077340382",
+                ],
+                [
+                    'title' => 'CSS Selectors',
+                    'description' => 'Learn about different CSS selectors.',
+                    "video"=>"1077340382",
+                ],
+                [
+                    'title' => 'JavaScript Variables',
+                    'description' => 'Understanding variables in JavaScript.',
+                    "video"=>"1077340382",
+                ],
+                [
+                    'title' => 'React Components',
+                    'description' => 'Learn about components in React.',
+                    "video"=>"1077340382",
+                ],
+            ]);
+        });
+
+        $frontEndCourse3=Course::create([
+            'title' => 'Veu.js Framework',
+            'description' => 'HTML, CSS, JavaScript and Vue.js Framework',
+            'sub_category_id' => 1,
+            "teacher_id"=>1,
+            "level"=>CourseLevelsEnums::BEGINNER,
+        ]);
+
+        $contents=$frontEndCourse3->contents()->createMany([
+            [
+                'title' => 'HTML Basics',
+                'description' => 'Learn the structure of web pages using HTML.',
+            ],
+            [
+                'title' => 'CSS Fundamentals',
+                'description' => 'Style your web pages with CSS.',
+            ],
+            [
+                'title' => 'JavaScript Essentials',
+                'description' => 'Make your web pages interactive with JavaScript.',
+            ],
+            [
+                'title' => 'Vue.js',
                 'description' => 'Explore popular frontend frameworks like React and Vue.',
             ],
         ]);

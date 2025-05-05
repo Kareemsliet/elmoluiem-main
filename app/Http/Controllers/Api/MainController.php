@@ -131,6 +131,10 @@ class MainController extends Controller
 
     public function courses(Request $request, $subCategory_id)
     {
+        $exceptId=$request->query("exceptId",null);
+
+        $excepts=[];
+
         $search = $request->query("q", "");
 
         $subCategory = SubCategory::find($subCategory_id);
@@ -139,7 +143,11 @@ class MainController extends Controller
             return failResponse("not found sub category");
         }
 
-        $courses = $subCategory->courses()->where("courses.title", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(10)->get();
+        if($exceptId){
+            $excepts[]=$exceptId;
+        }
+
+        $courses = $subCategory->courses()->where("courses.title", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(10)->get()->except($excepts);
 
         return successResponse(data: CourseResource::collection($courses));
     }
