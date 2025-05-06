@@ -75,7 +75,10 @@ class LessonController extends Controller
         $data = $request->only(["title", "description", "price"]);
 
         if ($request->logo) {
-            (new ImageService())->destroyImage($lesson->logo, "teachers/lessons");
+
+            if($lesson->logo){
+                (new ImageService())->destroyImage($lesson->logo, "teachers/lessons");
+            }
 
             $logo = (new ImageService())->uploadImage($request->file("logo"), "teachers/lessons");
 

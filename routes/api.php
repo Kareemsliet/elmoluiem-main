@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Teacher\Courses\ContentsController as TeacherConten
 use App\Http\Controllers\Api\Teacher\Courses\LectureController as TeacherLecturesCoursesController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\LessonController as LessonsMainController;
 
 Route::group(["prefix" => "main"], function () {
     Route::get('/countries', [MainController::class, 'countries']);
@@ -23,6 +24,7 @@ Route::group(["prefix" => "main"], function () {
     Route::get('{education_system_id}/education-levels', [MainController::class, 'educationlevels']);
     Route::get('{education_level_id}/subjects', [MainController::class, 'subjects']);
     Route::get("/teachers/{teacher_id}/details",[MainController::class,"teacherDetails"]);
+    Route::get("/{teacher_id}/lessons",[MainController::class,"teacherLessons"]);
 });
 
 Route::group(["prefix"=>"general"],function(){
@@ -37,6 +39,14 @@ Route::group(["prefix" => "/courses/{course_id}/"], function () {
     Route::get("/details",[CoursesController::class,"courseDetails"]);
     Route::get("/contents", [CoursesController::class, "contents"]);
     Route::get("/{content_id}/lectures", [CoursesController::class, "lectures"])->middleware("auth:sanctum");
+});
+
+Route::get("/lessons/all",[LessonsMainController::class,"allLessons"]);
+
+Route::group(["prefix" => "/lessons/{lesson_id}/"], function () {
+    Route::get("/details",[LessonsMainController::class,"lessonDetails"]);
+    Route::get("/contents", [LessonsMainController::class, "contents"]);
+    Route::get("/{content_id}/lectures", [LessonsMainController::class, "lectures"])->middleware("auth:sanctum");
 });
 
 Route::post("/verification-email/send", [MainController::class, "sendVerificationCode"])->middleware(["auth:teacher,student,family", "throttleApi:1,1"]);

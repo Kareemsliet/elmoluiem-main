@@ -11,8 +11,8 @@ class CreateLessonsTable extends Migration {
 			$table->timestamps();
 			$table->bigInteger('teacher_id')->unsigned();
 			$table->foreign("teacher_id")->references("id")->on("teachers")->onDelete("cascade")->onUpdate("cascade");
-			$table->decimal('price')->nullable()->default('0.0');
-			$table->string("logo");
+			$table->decimal('price')->nullable()->default(0.0);
+			$table->string("logo")->nullable();
 			$table->string('title', 255);
 			$table->text('description')->nullable();
 		});

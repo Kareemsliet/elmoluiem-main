@@ -23,7 +23,7 @@ class CoursesController extends Controller
     {
         $search = $request->query("q", "");
 
-        $courses = Course::where("title", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(10)->get();
+        $courses = Course::where("title", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(12)->get();
 
         return successResponse(data:CourseResource::collection($courses));
     }

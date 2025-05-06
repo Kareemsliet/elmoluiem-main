@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\CourseResource;
 use App\Http\Resources\EducationSystemResource;
+use App\Http\Resources\LessonReource;
 use App\Http\Resources\SubCategoryResource;
 use App\Http\Resources\SubjectResource;
 use App\Http\Resources\TeacherResource;
@@ -147,7 +148,7 @@ class MainController extends Controller
             $excepts[]=$exceptId;
         }
 
-        $courses = $subCategory->courses()->where("courses.title", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(10)->get()->except($excepts);
+        $courses = $subCategory->courses()->where("courses.title", 'like', "%$search%")->orderByDesc("created_at")->offset(0)->limit(6)->get()->except($excepts);
 
         return successResponse(data: CourseResource::collection($courses));
     }
@@ -161,6 +162,27 @@ class MainController extends Controller
         }
         
         return successResponse(data:new TeacherResource($teacher));
+    }
+
+    public function teacherLessons(Request $request,$teacher_id)
+    {
+        $exceptId=$request->query("exceptId",null);
+
+        $excepts=[];
+
+        if($exceptId){
+            $excepts[]=$exceptId;
+        }
+
+        $teacher = Teacher::find($teacher_id);
+
+        if (!$teacher || !is_numeric($teacher_id)) {
+            return failResponse("not found teacher");
+        }
+
+        $lessons=$teacher->lessons()->orderByDesc("created_at")->limit(6)->get()->except($excepts);
+
+        return successResponse(data:LessonReource::collection($lessons));
     }
 
 }

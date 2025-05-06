@@ -75,7 +75,10 @@ class CoursesController extends Controller
         $data = $request->only(["title", "description", "price","sub_category_id","level"]);
 
         if ($request->image) {
-            (new ImageService())->destroyImage($course->image, "teachers/courses");
+            
+            if($course->image){
+                (new ImageService())->destroyImage($course->image, "teachers/courses");
+            }
 
             $image = (new ImageService())->uploadImage($request->file("image"), "teachers/courses");
 
