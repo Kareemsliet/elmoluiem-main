@@ -24,7 +24,10 @@ Route::group(["prefix" => "main"], function () {
     Route::get('{education_system_id}/education-levels', [MainController::class, 'educationlevels']);
     Route::get('{education_level_id}/subjects', [MainController::class, 'subjects']);
     Route::get("/teachers/{teacher_id}/details",[MainController::class,"teacherDetails"]);
+    Route::get("/students/{student_id}/details",[MainController::class,"studentDetails"]);
+    Route::get("/parents/{parent_id}/details",[MainController::class,"familyDetails"]);
     Route::get("/{teacher_id}/lessons",[MainController::class,"teacherLessons"]);
+    Route::get("/search",[MainController::class,"search"])->middleware("auth:sanctum");
 });
 
 Route::group(["prefix"=>"general"],function(){
