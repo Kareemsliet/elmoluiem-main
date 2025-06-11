@@ -21,8 +21,26 @@ class QuestionsRequest extends FormRequest
      */
     public function rules(): array
     {
+        $teacher = $this->user("teacher");
+
+        $quizId = $this->route("quiz_id", 0);
+
+        $question = $this->route("question", 0);
+
         return [
-            'title' => 'required|string|max:255',
+            'title' => [
+                "required",
+                "string",
+                "max:225",
+                function ($attribute, $value, $fail) use ($teacher, $quizId, $question) {
+                    $quiz = $teacher->quizzes()->find($quizId);
+                    if ($quiz) {
+                        if ($quiz->questions()->whereNot('id', $question)->where("title", '=', $value)->exists()) {
+                            return $fail('A question with this title already exists in the quiz.');
+                        }
+                    }
+                }
+            ],
             'score' => 'required|integer|min:0',
             'options' => 'required|array|min:1',
             "options.*" => "array",

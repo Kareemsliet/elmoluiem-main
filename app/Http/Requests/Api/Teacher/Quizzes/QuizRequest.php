@@ -21,10 +21,21 @@ class QuizRequest extends FormRequest
      */
     public function rules(): array
     {
-        $quiz =$this->route("quiz",0);
+        $teacher = $this->user("teacher");
+
+        $quiz = $this->route("quiz",0);
 
         return [
-            'title' => "required|string|max:255|unique:quizzes,title,$quiz",
+            'title' => [
+                "required",
+                "string",
+                "max:255",
+                function ($attribute, $value, $fail) use ($teacher,$quiz) {
+                    if ($teacher->quizzes()->whereNot('id',$quiz)->where("title","=",$value)->exists()) {
+                        return $fail('A quiz with this title already exists.');
+                    }
+                }
+            ],
             'academic_year' => 'required|integer',
             'start_time' => 'required|date_format:H:i|before:end_time',
             'end_time' => 'required|date_format:H:i',

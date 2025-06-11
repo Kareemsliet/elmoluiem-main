@@ -106,6 +106,8 @@ class QuestionsController extends Controller
             return failResponse("Question not found");
         }
 
+        $request->validated();
+
         $data = $request->only(["title", "score"]);
 
         $question->update($data);
