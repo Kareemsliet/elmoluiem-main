@@ -27,7 +27,10 @@ class QuestionsRequest extends FormRequest
             'options' => 'required|array|min:1',
             "options.*" => "array",
             'options.*.title' => 'required|string|max:255',
-            'options.*.is_correct' => 'required|in:0,1',
+            'options.*.is_correct' => [
+                "required",
+                "in:0,1",
+            ]
         ];
     }
 

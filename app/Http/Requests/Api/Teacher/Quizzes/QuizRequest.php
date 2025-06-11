@@ -27,9 +27,9 @@ class QuizRequest extends FormRequest
             'title' => "required|string|max:255|unique:quizzes,title,$quiz",
             'academic_year' => 'required|integer',
             'start_time' => 'required|date_format:H:i|before:end_time',
-            'end_time' => 'required|date_format:H:i|after_or_equal:start_time',
+            'end_time' => 'required|date_format:H:i',
             'time_limit' => 'required|integer|min:1',
-            'date' => 'required|date',
+            'date' => 'required|date|date_format:Y-m-d',
             'subject_id' => 'required|integer|exists:subjects,id',
             'education_level_id' => 'required|integer|exists:education_levels,id',
         ];

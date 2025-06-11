@@ -29,14 +29,14 @@ class QuestionsController extends Controller
 
         $questions = $quiz->questions()->orderByDesc("created_at")->get();
 
-        return successResponse(data:QuizzQuestionsResource::collection($questions));
+        return successResponse(data: QuizzQuestionsResource::collection($questions));
     }
 
     /**
      * Store a newly created resource in storage.
      */
 
-    public function store(QuestionsRequest $request,$quiz_id)
+    public function store(QuestionsRequest $request, $quiz_id)
     {
         $quiz = $this->teacher->quizzes()->find($quiz_id);
 
@@ -48,11 +48,23 @@ class QuestionsController extends Controller
 
         $data = $request->only(["title", "score"]);
 
-        $options = collect($request->options)->unique()->toArray();
+        $options = collect($request->options)->unique();
 
-        $question=$quiz->questions()->create($data);
+        $correctOptionsCount = $options->where("is_correct", 1)->count();
 
-        $question->options()->createMany($options);
+        if ($correctOptionsCount > 1) {
+            return failResponse("You can only have one correct option per question.");
+        }
+
+        if ($correctOptionsCount == 0) {
+            return failResponse("You must have at least one correct option.");
+        }
+
+        $question = $quiz->questions()->create($data);
+
+        $options->map(function ($option) use ($question) {
+            $question->options()->create($option);
+        });
 
         return successResponse("Question added successfully", new QuizzQuestionsResource($question));
     }
@@ -60,7 +72,7 @@ class QuestionsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($quiz,string $id)
+    public function show($quiz, string $id)
     {
         $quiz = $this->teacher->quizzes()->find($quiz);
 
@@ -80,7 +92,7 @@ class QuestionsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(QuestionsRequest $request,$quiz,string $id)
+    public function update(QuestionsRequest $request, $quiz, string $id)
     {
         $quiz = $this->teacher->quizzes()->find($quiz);
 
@@ -98,9 +110,22 @@ class QuestionsController extends Controller
 
         $question->update($data);
 
-        if ($request->has("options")) {
-            $options = collect($request->options)->unique()->toArray();
+        if ($request->options) {
+
+            $options = collect($request->options)->unique();
+
+            $correctOptionsCount = $options->where("is_correct", 1)->count();
+
+            if ($correctOptionsCount > 1) {
+                return failResponse("You can only have one correct option per question.");
+            }
+
+            if ($correctOptionsCount == 0) {
+                return failResponse("You must have at least one correct option.");
+            }
+
             $question->options()->delete();
+
             $question->options()->createMany($options);
         }
 
@@ -110,7 +135,7 @@ class QuestionsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($quiz,string $id)
+    public function destroy($quiz, string $id)
     {
         $quiz = $this->teacher->quizzes()->find($quiz);
 

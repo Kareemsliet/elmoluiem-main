@@ -18,7 +18,6 @@ class QuestionOptionsResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'is_correct' => $this->is_correct,
-            'question' => new QuizzQuestionsResource($this->question),
         ];
     }
 }

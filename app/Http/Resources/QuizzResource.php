@@ -22,9 +22,9 @@ class QuizzResource extends JsonResource
             'end_time' => $this->end_time,
             'time_limit' => $this->time_limit,
             'date' => $this->date,
+            "total_score" => $this->questions->sum('score'),
             'subject' => new SubjectResource($this->subject),
             'education_level' => new EducationLevelResource($this->educationLevel),
-            'questions' => QuizzQuestionsResource::collection($this->questions),
         ];
     }
 }
