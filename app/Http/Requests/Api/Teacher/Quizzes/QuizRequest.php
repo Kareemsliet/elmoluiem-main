@@ -21,8 +21,10 @@ class QuizRequest extends FormRequest
      */
     public function rules(): array
     {
+        $quiz =$this->route("quiz",0);
+
         return [
-            'title' => 'required|string|max:255',
+            'title' => "required|string|max:255|unique:quizzes,title,$quiz",
             'academic_year' => 'required|integer',
             'start_time' => 'required|date_format:H:i|before:end_time',
             'end_time' => 'required|date_format:H:i|after_or_equal:start_time',

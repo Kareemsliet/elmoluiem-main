@@ -25,12 +25,13 @@ class QuestionsRequest extends FormRequest
             'title' => 'required|string|max:255',
             'score' => 'required|integer|min:0',
             'options' => 'required|array|min:1',
+            "options.*" => "array",
             'options.*.title' => 'required|string|max:255',
-            'options.*.is_correct' => 'required|boolean',
+            'options.*.is_correct' => 'required|in:0,1',
         ];
     }
 
-     public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
         return failResponse($validator->errors()->first());
     }

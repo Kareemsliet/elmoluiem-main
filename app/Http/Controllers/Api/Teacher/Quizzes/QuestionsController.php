@@ -1,0 +1,133 @@
+<?php
+
+namespace App\Http\Controllers\Api\Teacher\Quizzes;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Teacher\Quizzes\QuestionsRequest;
+use App\Http\Resources\QuizzQuestionsResource;
+
+class QuestionsController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+
+    protected $teacher;
+
+    public function __construct()
+    {
+        $this->teacher = auth("teacher")->user();
+    }
+
+    public function index($quiz_id)
+    {
+        $quiz = $this->teacher->quizzes()->find($quiz_id);
+
+        if (!$quiz) {
+            return failResponse("Quiz not found");
+        }
+
+        $questions = $quiz->questions()->orderByDesc("created_at")->get();
+
+        return successResponse(data:QuizzQuestionsResource::collection($questions));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+
+    public function store(QuestionsRequest $request,$quiz_id)
+    {
+        $quiz = $this->teacher->quizzes()->find($quiz_id);
+
+        if (!$quiz) {
+            return failResponse("Quiz not found");
+        }
+
+        $request->validated();
+
+        $data = $request->only(["title", "score"]);
+
+        $options = collect($request->options)->unique()->toArray();
+
+        $question=$quiz->questions()->create($data);
+
+        $question->options()->createMany($options);
+
+        return successResponse("Question added successfully", new QuizzQuestionsResource($question));
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show($quiz,string $id)
+    {
+        $quiz = $this->teacher->quizzes()->find($quiz);
+
+        if (!$quiz) {
+            return failResponse("Quiz not found");
+        }
+
+        $question = $quiz->questions()->find($id);
+
+        if (!$question) {
+            return failResponse("Question not found");
+        }
+
+        return successResponse(data: new QuizzQuestionsResource($question));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(QuestionsRequest $request,$quiz,string $id)
+    {
+        $quiz = $this->teacher->quizzes()->find($quiz);
+
+        if (!$quiz) {
+            return failResponse("Quiz not found");
+        }
+
+        $question = $quiz->questions()->find($id);
+
+        if (!$question) {
+            return failResponse("Question not found");
+        }
+
+        $data = $request->only(["title", "score"]);
+
+        $question->update($data);
+
+        if ($request->has("options")) {
+            $options = collect($request->options)->unique()->toArray();
+            $question->options()->delete();
+            $question->options()->createMany($options);
+        }
+
+        return successResponse("Question updated successfully", new QuizzQuestionsResource($question));
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($quiz,string $id)
+    {
+        $quiz = $this->teacher->quizzes()->find($quiz);
+
+        if (!$quiz) {
+            return failResponse("Quiz not found");
+        }
+
+        $question = $quiz->questions()->find($id);
+
+        if (!$question) {
+            return failResponse("Question not found");
+        }
+
+        $question->options()->delete();
+
+        $question->delete();
+
+        return successResponse("Question deleted successfully");
+    }
+}

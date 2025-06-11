@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string("academic_year")->nullable();
             $table->string("start_time")->nullable();
             $table->string("end_time")->nullable();
+            $table->foreignId("teacher_id")->constrained('teachers')->onDelete('cascade');
             $table->integer("time_limit")->default(0)->comment('Time limit in minutes');
             $table->timestamp("date")->nullable();
             $table->timestamps();

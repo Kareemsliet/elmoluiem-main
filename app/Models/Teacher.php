@@ -89,4 +89,9 @@ class Teacher extends Authenticatable implements MustVerifyEmail
         return $this->morphToMany(Conversation::class,"messageable","hidden_conversation")->withTimestamps();
     }
 
+    public function quizzes()
+    {
+        return $this->hasMany(Quiz::class, 'teacher_id');
+    }
+
 }
